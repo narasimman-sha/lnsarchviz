@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LnsArchviz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            interpolate-size: allow-keywords;
+        }
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: "Roboto", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
+        img, button {
+            display: block;
+            width: 100%;
+        }
+        .main-container {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 7px;
+            height: 100vh;
+            padding: 0px 5px 0 5px;
+            background-image: url('images/BGDay.webp');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            transition: 0.35s;
+        }
+        .container {
+            position: relative;
+            height: 95%;
+            /* max-width: 1050px; */
+            flex: 1 1 66%;
+            aspect-ratio: 3 / 2;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        .container .child-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transform-origin: center center;
+            user-select: none;
+            -webkit-user-drag: none;
+            transition: 0.5s cubic-bezier(0.1, 0.9, 0.2, 1);
+        }
+        .container child-container.tracking {
+            transition: none !important;
+        }
+        #main-video {
+            display: block;
+            object-fit: contain;
+            opacity: 1;
+            position: absolute;
+            height: 100%;
+            object-fit: contain;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            border-radius: 15px;
+        }
+        #freeze-canvas {
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 100%;
+            object-fit: contain;
+            z-index: 2;
+            opacity: 0;
+            pointer-events: none;
+        }
+        #left-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: 0.35s;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        #left-btn:hover {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        #left-btn svg {
+            fill: #ffffff;
+            height: 40px;
+            width: 40px;
+        }
+        #right-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 15px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: 0.35s;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 2px 0 0 3px;
+        }
+        #right-btn:hover {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        #right-btn svg {
+            fill: #ffffff;
+            height: 40px;
+            width: 40px;
+        }
+        
+        #timetrigger {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 200px;
+            transform: translate(-50%, 0%);
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        #timetrigger svg {
+            fill: white;
+            height: 20px;
+            transition: 0.35s;
+        }
+        #daytrigger {
+            flex: 1 1 45%;
+            color: white;
+            background: transparent;
+            border: 0;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            font-size: 1.1rem;
+            padding: 8px;
+            font-weight: 600;
+        }
+        
+        #daytrigger:hover {
+            background-color: #dddddd5a;
+            color: #353535;
+        }
+        
+        #nighttrigger {
+            flex: 1 1 50%;
+            color: white;
+            background: transparent;
+            border: 0;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            font-size: 1.1rem;
+            padding: 8px 12px 8px 8px; 
+            font-weight: 600;
+        }
+        #nighttrigger:hover {
+            background-color: #dddddd5a;
+            color: #353535;
+        }
+        .tactive {
+            color: #1c1c1c !important;
+            background-color: #edf1f4 !important;
+            
+        }
+        .tactive svg {
+            fill: #1c1c1c !important;
+        }
+        .plane-container {
+            display: block;
+            position: relative;
+            z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 100%;
+            opacity: 1;
+            /* don't delete it will works through js */
+            /* perspective: 1000px; */
+            object-fit: contain;
+            transition: opacity 0.5s;
+        }
+        .plane-container.is-hidden-3d {
+            opacity: 0;
+        }
+        .plane-container.is-hidden-3d div {
+            pointer-events: none;
+        }
+        .floor {
+            position: absolute;
+            transform-style: preserve-3d;
+            left: 50%;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            backface-visibility: visible;
+            transition-property: transform;
+            transition-duration: 1.6667s;
+            transition-timing-function: cubic-bezier(0.35, 0.00, 0.65, 1);
+            transition-delay: 0ms;
+            /* transition: opacity 0.35s linear; */
+        }
+
+        /* .floor.is-hidden-3d {
+            opacity: 0.9;
+            pointer-events: none;
+        } */
+        .floor1 {
+            bottom: 29.25%;
+        }
+        .floor2 {
+            bottom: 34.75%;
+        }
+        .floor3 {
+            bottom: 40.25%;
+        }
+        .floor4 {
+            bottom: 45.75%;
+        }
+        .floor5 {
+            bottom: 51.25%;
+        }
+        .floor6 {
+            bottom: 56.8%;
+        }
+        .floor7 {
+            bottom: 62.35%;
+        }
+        .floor8 {
+            bottom: 67.85%;
+        }
+        .floor9 {
+            bottom: 73.4%;
+        }
+        .floor10 {
+            bottom: 79%;
+        }
+        .front, .back {
+            position: absolute;
+            /* don't remove height and width for js check */
+            /* width: 280px;
+            height: 35px; */
+            transform-style: preserve-3d;
+            display: flex;
+            justify-content: space-between;
+            gap: 5%;
+            backface-visibility: hidden;
+            opacity: 1;
+            pointer-events: auto;
+            transition: opacity 0.35s ease-in-out;
+        }
+        .left, .right {
+            position: absolute;
+            /* don't remove height and width for js check */
+            /* width: 280px;
+            height: 35px; */
+            transform-style: preserve-3d;
+            display: flex;
+            justify-content: space-between;
+            gap: 5%;
+            backface-visibility: hidden;
+            opacity: 1;
+            pointer-events: auto;
+            transition: opacity 0.35s ease-in-out;
+        }
+
+        .front.is-hidden-3d, .back.is-hidden-3d, .right.is-hidden-3d, .left.is-hidden-3d {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .front.is-hidden-3d > div, .back.is-hidden-3d > div, .right.is-hidden-3d > div, .left.is-hidden-3d > div {
+            pointer-events: none;
+        }
+
+        .front > div, .left > div, .back > div, .right > div {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+            /* Transition opacity and transform concurrently for 3D realism */
+            transition: opacity 0.4s ease, transform 0.4s ease-out;
+        }
+
+        .front > div.is-hidden-3d, 
+        .left > div.is-hidden-3d, 
+        .back > div.is-hidden-3d, 
+        .right > div.is-hidden-3d {
+            /* transform: scaleY(0.7); */
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .front {
+            transform: rotateY(0deg) translateZ(145px) translateX(0);
+        }
+        .left {
+            transform: rotateY(90deg) translateZ(145px) translateX(3px);
+        }
+        .back {
+            transform: rotateY(180deg) translateZ(145px) translateX(2px);
+        }
+        .right {
+            transform: rotateY(270deg) translateZ(145px) translateX(0px);
+        }
+        
+        .smallside {
+            height: 100%;
+            text-align: center;
+            color: white;
+            flex: 0 0 34%;
+            /* backdrop-filter: blur(1px); */
+            backface-visibility: hidden;
+            cursor: pointer;
+            font-size: 1.1rem;
+            /* color: rgba(47, 85, 88, 0.9); */
+            font-weight: 800;
+        }
+        
+        .largeside {
+            height: 100%;
+            text-align: center;
+            color: white;
+            flex: 0 0 50%;
+            backface-visibility: hidden;
+            cursor: pointer;
+            font-size: 1.1rem;
+            /* color: rgb(233, 216, 195); */
+            font-weight: 800;
+        }
+        .arc {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) scale(0.3);
+            border-radius: 50%;
+            border: 3px solid transparent;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease, filter 0.35s ease;
+            will-change: opacity, transform, filter;
+            backface-visibility: hidden;
+            pointer-events: none;
+        }
+        .arc.lefts {
+            pointer-events: none;
+            right: 100%; /* Anchor to the outer left edge of the ring */
+        }
+        .arc.rights {
+            pointer-events: none;
+            left: 100%; /* Anchor to the outer right edge of the ring */
+        }
+        
+        .bhk2 {
+            position: relative;
+            background-color: rgba(222, 184, 135, 0.2);
+            border: 2px solid rgba(222, 184, 135, 0.9);
+            box-shadow: 0 0 12px rgba(222, 184, 135, 0.75), inset 0 0 15px rgba(222, 184, 135, 0.3);
+            border-radius: 8px;
+            
+        }
+        .bhk2:hover .arc {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+        
+        .bhk2 .arc.lefts.inner {
+          /* width: 25px;
+          height: 35px; */
+          margin-right: -10px; /* Distance from the ring */
+          border-left-color: rgba(222, 184, 135, 0.8);
+          filter: drop-shadow(0 0 4px rgba(222, 184, 135, 0.5));
+        }
+
+        .bhk2 .arc.lefts.outer {
+          /* width: 35px;
+          height: 45px; */
+          margin-right: -10px;
+          border-left-color: rgba(222, 184, 135, 0.3);
+        }
+        
+
+        .bhk2 .arc.rights.inner {
+          /* width: 25px;
+          height: 35px; */
+          margin-left: -10px;
+          border-right-color: rgba(222, 184, 135, 0.8);
+          filter: drop-shadow(0 0 4px rgba(222, 184, 135,0.5));
+        }
+
+        .bhk2 .arc.rights.outer {
+          /* width: 35px;
+          height: 45px; */
+          margin-left: -10px;
+          border-right-color: rgba(222, 184, 135, 0.3);
+        }
+        
+        
+        .bhk3 {
+            position: relative;
+            background-color: rgba(83, 138, 144, 0.05);
+            border: 2px solid rgba(83, 138, 144, 0.9);
+            box-shadow: 0 0 12px rgba(83, 138, 144, 0.75), inset 0 0 15px rgba(83, 138, 144, 0.3);
+            border-radius: 8px;
+            
+        }
+        .bhk3:hover .arc {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+        
+        .bhk3 .arc.lefts.inner {
+          /* width: 25px;
+          height: 35px; */
+          margin-right: -10px; /* Distance from the ring */
+          border-left-color: rgba(83, 138, 144, 0.8);
+          filter: drop-shadow(0 0 4px rgba(83, 138, 144, 0.5));
+        }
+
+        .bhk3 .arc.lefts.outer {
+          /* width: 35px;
+          height: 45px; */
+          margin-right: -10px;
+          border-left-color: rgba(83, 138, 144, 0.5);
+        }
+
+        .bhk3 .arc.rights.inner {
+          /* width: 25px;
+          height: 35px; */
+          margin-left: -10px;
+          border-right-color: rgba(83, 138, 144, 0.8);
+          filter: drop-shadow(0 0 4px rgba(83, 138, 144,0.5));
+        }
+
+        .bhk3 .arc.rights.outer {
+          /* width: 35px;
+          height: 45px; */
+          margin-left: -10px;
+          border-right-color: rgba(83, 138, 144, 0.5);
+        }
+        
+        #smallmap {
+            position: absolute;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 100px;
+            height: 100px;
+            left: 15px;
+            bottom: 15px;
+            border-radius: 25px;
+            box-shadow: 3px 3px 4px rgb(70, 70, 70);
+            cursor: pointer;
+            transition: 0.35s;
+            padding: 6px;
+        }
+        #smallmap:hover {
+            transform: scale(1.025);
+            box-shadow: 4px 4px 6px rgb(70, 70, 70);
+        }
+        #smallmap.night {
+            box-shadow: none;
+        }
+        #smallmap:hover .mapimage {
+            transform: scale(1.15);
+        }
+        .mapcontainer {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .mapimage {
+            background-image: url(Images/minimap.webp);
+            background-size: cover;
+            width: 100%;
+            height: 100%;
+            transition: 0.35s;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            z-index: 6;
+        }
+        .modal {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            /* Start slightly smaller for a pop-in effect */
+            transform: scale(0.9);
+            transition: transform 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay.active .modal {
+            transform: scale(1);
+        }
+        #close-map-btn {
+            position: absolute;
+            width: 32px;
+            top: 25px;
+            right: 24px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            background-color: #a4544f;
+            line-height: 1;
+            cursor: pointer;
+            color: white;
+            border-radius: 12px;
+            transition: 0.35s;
+        }
+
+        #close-map-btn:hover {
+            color: rgb(206, 206, 206); /* Google Red */
+        }
+        .iframe-container {
+            margin-top: 0;
+            width: 100%;
+            height: 60vh; /* Takes up 60% of viewport height */
+            min-height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #planetrigger {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 20px;
+            z-index: 3;
+            color: white;
+        }
+        #plane-btn {
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px 8px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: 0.35s;
+            
+        }
+        
+        #plane-btn:hover {
+           border: 2px solid rgba(255, 255, 255, 0.3);
+           color: #e3e3e3;
+        }
+        .showcolors {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            gap: 8px;
+            transition: max-width 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+            opacity 0.6s ease-in-out,
+            margin-left 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+            padding 0.4s ease-in-out,
+            border 0.4s ease-in-out;
+        }
+        .showcolors.open {
+            cursor: default;
+            max-width: 250px;
+            margin-left: 5px;
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 4px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .showcolors.close {
+            max-width: 0;
+            padding: 0;
+            opacity: 0;
+            border: 0;
+            margin-left: 0;
+            overflow: hidden;
+            
+        }
+        .showcolors:hover {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .showcolors > div {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            color: #fffdfd;
+        }
+
+        #color1 span { 
+            background-color: rgba(222,184,135,0.75); 
+            width:10px; 
+            height:10px; 
+            border-radius:50%; 
+            display:inline-block; 
+        }
+        #color2 span { 
+            background-color: rgba(83,138,144,0.75); 
+            width:10px; 
+            height:10px; 
+            border-radius:50%; 
+            display:inline-block; 
+        }
+        #color3 span { 
+            background-color: rgba(211,0,0,0.75); 
+            width:10px; 
+            height:10px; 
+            border-radius:50%; 
+            display:inline-block; 
+        }
+        #details-container {
+            background-color: rgba(255, 255, 255, 0.4);
+            flex: 1 1 30%;
+            height: 95%;
+            border-radius: 20px;
+            overflow-y: scroll;
+        }
+        #detail-container {
+            padding: 5px 5px;
+            display: flex;
+            flex-flow: column nowrap;
+        }
+        details summary {
+            list-style: none;  
+        }
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+        details summary::marker { display: none; }
+        details::details-content {
+            block-size: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: block-size 0.4s ease-in-out, opacity 0.4s ease-in-out, content-visibility 0.4s ease-in-out;
+            transition-behavior: allow-discrete;
+        }
+        details[open]::details-content {
+            block-size: auto;
+            opacity: 1;
+        }
+        /* details[open] .FloorHead > h2 {
+            border-bottom: 2px solid rgba(0, 0, 0, 0.762);
+        } */
+        .singlefloor {
+            border: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 0 5px;
+            background: transparent;
+            transition: 0.5s;
+            user-select: none;
+            opacity: 1;
+            margin-bottom: 5px;
+            max-height: 600px;
+            transition: 0.5s ;
+        }
+        .singlefloor.is-hidden {
+            padding: 0;
+            opacity: 0;
+            max-height: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            pointer-events: none;
+        }
+        .FloorHead {
+            background-color: rgba(255, 255, 255, 0.85);
+            margin: 10px 8px 10px 8px;
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 0px 3px 12px rgb(195, 200, 204);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .FloorHead > h2 {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 7px;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 0 3px 14px;
+            
+        }
+        .FloorHead > h2 > span:nth-child(2) {
+            font-weight: 800;
+        }
+        .FloorHead > div {
+            padding: 6px 10px 0px 0;
+        }
+        .FloorHead > div > svg {
+            fill: rgb(89, 109, 118);
+            transition: 0.35s;
+        }
+        .FloorHead > h2 > span:nth-child(1) > svg {
+            fill: rgb(70, 70, 70);
+            transition: 0.35s;
+        }
+        .FloorHead > div:hover > svg {
+            fill: rgb(18, 62, 67);
+        }
+        details[open] .FloorHead > div > svg {
+            transform: rotateZ(180deg);
+        }
+        details[open] .FloorHead > h2 > span:nth-child(1) > svg {
+            fill: rgb(59, 102, 107);
+        }
+        .ullist {
+            display: flex;
+            flex-flow: row wrap;
+            padding: 3px 3px 8px 3px;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+        .lilist {
+            flex: 1 1 45%;
+            list-style: none;
+            border-radius: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            margin: 6px;
+            overflow: hidden;
+            box-shadow: 0px 3px 12px rgb(136, 144, 149);
+            opacity: 1;
+            overflow: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+        .lilist.is-hidden {
+            flex-grow: 0;
+            flex-basis: 0;
+            border: 0;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            margin: 0;
+            pointer-events: none;
+        }
+        
+        .licontainer {
+            background-color: rgba(255, 255, 255, 0.75);
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 16px 8px 10px 12px;
+            font-size: 16px;
+            scroll-margin-top: 20px;
+            transition: border 0.75s linear;
+            cursor: default;
+            transition: 0.35s;
+        }
+        .lactive {
+            background-color: rgba(210, 210, 210, 0.85);
+        }
+        [class^="seg"] {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 5px;
+        }
+        .seg0 {
+            justify-content: space-between;
+            align-items: center;
+        }
+        .seg0 div {
+            /* display: flex;
+            flex-flow: row nowrap;
+            gap: 3px;
+            justify-content: center;
+            align-items: center; */
+            position: relative;
+        }
+        .seg0 > h3 {
+            color: #030038;
+            font-weight: 800;
+            font-size: 1.3em;
+        }
+        .seg0 > div > button {
+            display: inline-block;
+            background: none;
+            outline: none;
+            border: 0;
+            cursor: pointer;
+        }
+        .seg0 > div > button > svg {
+            width: 22px;
+            height: 22px;
+            transition: 0.35s;
+            border-radius: 5px;
+            fill: rgb(89, 109, 118);
+        }
+        .seg0 > div > button:hover svg {
+            fill: rgb(18, 62, 67);
+        }
+        .seg0 .selecticon {
+            position: absolute;
+            transition: 0.35s;
+            top: -9px;
+            right: -2px;
+            width: 6px;
+            height: 6px;
+            opacity: 0;
+        }
+        .sactive {
+            background-color:rgb(83, 138, 144);
+            box-shadow:  0px 0px 3px 3px rgb(83, 138, 144);
+            border-radius: 50%;
+            opacity: 0;
+            animation: sactiveanim 5s linear forwards;
+        }
+        
+        @keyframes sactiveanim {
+            0% {
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            40% {
+                opacity: 0.15;
+            }
+            60% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 0.15;
+            }
+            100% {
+                opacity: 1;
+            }
+
+        }
+        .seg1 {
+            gap: 10px;
+            font-size: 1em;
+            
+        }
+        .seg1 > p {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+        }
+        .seg2 {
+            font-size: 1em;
+        }
+        .seg2 > p {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .seg2 > p > span {
+            font-weight: 600;
+        }
+        .seg3 {
+            margin: 5px 0;
+            font-size: 1.5em;
+            color: rgb(148, 108, 7);
+            /* color: rgb(222,184,135); */
+        }
+        .seg3 > p {
+            font-weight: 800;
+        }
+        .seg3 > p > span {
+           font-weight: 800; 
+        }
+        .seg4 {
+            font-size: 1em;
+        }
+        .seg4 > button {
+            background-color: rgb(59, 102, 107);
+            font-weight: 600;
+            font-size: 1em;
+            color: white;
+            border: 0;
+            outline: none;
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            transition: 0.35s;
+        }
+        .seg4 > button:hover {
+            background-color: rgb(24, 62, 66);
+        }
+        #filter-container {
+            color: #333;
+            font-size: 15px;
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            margin: 24px 20px 0px 20px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+        }
+        #selection-btn {
+            flex: 1 1 60%;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+        #floorselection {
+            font-size: 1.1em;
+            font-weight: 600;
+            padding: 5px;
+            outline: none;
+            border: none;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+        }
+        #filter-container > div > button {
+            font-size: 1.1em;
+            font-weight: 600;
+            /* display: inline-block; */
+            width: auto;
+            padding: 5px;
+            outline: none;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: transparent;
+            transition: 0.35s;
+            display: flex;
+            flex-flow: row now;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+        }
+        #filter-container > div > button:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            
+        }
+        .bhkactive {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+        }
+        .slider-container {
+            /* max-width: 170px; */
+            padding-top: 5px;
+            flex: 1 1 35%;
+            font-family: sans-serif;
+            border-radius: 8px;
+        }
+        .slider-label {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-evenly;
+            max-width: 160px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            margin: 4px 0 8px 0;
+            text-align: right;
+        }
+        .slider-label span {
+            font-weight: 600;
+        }
+        .range-slider {
+            position: relative;
+            width: 100%;
+            height: 20px;
+        }
+        .range-slider input[type="range"] {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            background: none;
+            pointer-events: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .slider-track {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: #2c3e50; /* Dark line color from your image */
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            border-radius: 2px;
+        }
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .range-slider input[type="range"]::-moz-range-thumb {
+            height: 16px;
+            width: 16px;
+            border: none;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        @media screen and (max-width: 1400px) {
+            .container {
+                flex: 1 1 63%;
+            }
+            #details-container {
+                flex: 1 1 35%;
+            }
+            .licontainer {
+                font-size: 12px;
+            }
+        }
+        @media screen and (max-width: 1100px) {
+            
+            .main-container {
+                padding: 10px 5px;
+                flex-flow: column nowrap;
+                height: 160vh;
+            }
+            .container {
+                flex: 1 1 70vh;
+                width: 100%;
+            }
+            
+            .bhk3, .bhk2 {
+                font-size: 10px;
+            }
+            #planetrigger {
+                font-size: 10px;
+            }
+            #details-container {
+                flex: 1 1 85vh;
+                width: 100%;
+            }
+            #filter-container {
+                font-size: 14px;
+                justify-content: space-between;
+            }
+            #selection-btn {
+                justify-content: flex-start;
+            }
+            .lilist {
+                flex-basis: 20%;
+            }
+            .licontainer {
+                font-size: 10px;
+            }
+            
+            #left-btn, #right-btn {
+                width: 40px;
+                height: 40px;
+            }
+            #right-btn svg {
+                height: 30px;
+                width: 30px;
+            }
+            #left-btn svg {
+                height: 30px;
+                width: 30px;
+            }
+            #left-btn {
+                padding: 2px 2px 0 0 ;
+                left: 5px;
+            }
+            #right-btn {
+                right: 5px;
+            }
+        }
+        @media screen and (max-width: 700px) {
+            #timetrigger {
+                width: 170px;
+            }
+            #daytrigger {
+                padding: 4px;
+            }
+            #nighttrigger {
+                padding: 4px 8px 4px 4px;
+            }
+            #smallmap {
+                border-radius: 15px;
+                padding: 3px;
+                width: 60px;
+                height: 60px;
+                left: 5px;
+                bottom: 10px;
+            }
+            .mapcontainer {
+                border-radius: 12px;
+            }
+            .modal {
+                padding: 10px;
+            }
+            .lilist {
+                flex-basis: 45%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="container">
+            <div class="child-container">
+            <video id="main-video" onloadedmetadata="this.playbackRate = 1.0;" muted></video>
+            <!-- <video id="background-video" src="video/Clouds1.mp4" onloadedmetadata="this.playbackRate = 0.5;" autoplay loop muted></video> -->
+            <canvas id="freeze-canvas"></canvas>
+            
+            <div class="plane-container">
+                <div class="floor1 floor" data-floor-id="floor1">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat11">Flat 11</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat12">Flat 12</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat12">Flat 12</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat13">Flat 13</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat13">Flat 13</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat14">Flat 14</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat14">Flat 14</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat11">Flat 11</div>
+                    </div>
+                </div>
+                <div class="floor2 floor" data-floor-id="floor2">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat21">Flat 21</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat22">Flat 22</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat22">Flat 22</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat23">Flat 23</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat23">Flat 23</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat24">Flat 24</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat24">Flat 24</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat21">Flat 21</div>
+                    </div>
+                </div>
+                <div class="floor3 floor" data-floor-id="floor3">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat31">Flat 31</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat32">Flat 32</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat32">Flat 32</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat33">Flat 33</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat33">Flat 33</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat34">Flat 34</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat34">Flat 34</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat31">Flat 31</div>
+                    </div>
+                </div>
+                <div class="floor4 floor" data-floor-id="floor4">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat41">Flat 41</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat42">Flat 42</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat42">Flat 42</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat43">Flat 43</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat43">Flat 43</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat44">Flat 44</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat44">Flat 44</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat41">Flat 41</div>
+                    </div>
+                </div>
+                <div class="floor5 floor" data-floor-id="floor5">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat51">Flat 51</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat52">Flat 52</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat52">Flat 52</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat53">Flat 53</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat53">Flat 53</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat54">Flat 54</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat54">Flat 54</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat51">Flat 51</div>
+                    </div>
+                </div>
+                <div class="floor6 floor" data-floor-id="floor6">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat61">Flat 61</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat62">Flat 62</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat62">Flat 62</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat63">Flat 63</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat63">Flat 63</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat64">Flat 64</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat64">Flat 64</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat61">Flat 61</div>
+                    </div>
+                </div>
+                <div class="floor7 floor" data-floor-id="floor7">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat71">Flat 71</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat72">Flat 72</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat72">Flat 72</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat73">Flat 73</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat73">Flat 73</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat74">Flat 74</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat74">Flat 74</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat71">Flat 71</div>
+                    </div>
+                </div>
+                <div class="floor8 floor" data-floor-id="floor8">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat81">Flat 81</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat82">Flat 82</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat82">Flat 82</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat83">Flat 83</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat83">Flat 83</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat84">Flat 84</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat84">Flat 84</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat81">Flat 81</div>
+                    </div>
+                </div>
+                <div class="floor9 floor" data-floor-id="floor9">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat91">Flat 91</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat92">Flat 92</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat92">Flat 92</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat93">Flat 93</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat93">Flat 93</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat94">Flat 94</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat94">Flat 94</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat91">Flat 91</div>
+                    </div>
+                </div>
+                <div class="floor10 floor" data-floor-id="floor10">
+                    <div class="front">
+                        <div class="bhk2 smallside" data-flat-id="Flat101">Flat 101</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat102">Flat 102</div>
+                    </div>
+                    <div class="left">
+                        <div class="bhk3 smallside" data-flat-id="Flat102">Flat 102</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat103">Flat 103</div>
+                    </div>
+                    <div class="back">
+                        <div class="bhk2 smallside" data-flat-id="Flat103">Flat 103</div>
+                        <div class="bhk3 largeside" data-flat-id="Flat104">Flat 104</div>
+                    </div>
+                    <div class="right">
+                        <div class="bhk3 smallside" data-flat-id="Flat104">Flat 104</div>
+                        <div class="bhk2 largeside" data-flat-id="Flat101">Flat 101</div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <button id="left-btn"><svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#1f1f1f"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/></svg></button>
+            <button id="right-btn"><svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#1f1f1f"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg></button>
+            <div id="timetrigger">
+                <button id="daytrigger" class="tactive">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M440-760v-160h80v160h-80Zm266 110-55-55 112-115 56 57-113 113Zm54 210v-80h160v80H760ZM440-40v-160h80v160h-80ZM254-652 140-763l57-56 113 113-56 54Zm508 512L651-255l54-54 114 110-57 59ZM40-440v-80h160v80H40Zm157 300-56-57 112-112 29 27 29 28-114 114Zm113-170q-70-70-70-170t70-170q70-70 170-70t170 70q70 70 70 170t-70 170q-70 70-170 70t-170-70Zm283-57q47-47 47-113t-47-113q-47-47-113-47t-113 47q-47 47-47 113t47 113q47 47 113 47t113-47ZM480-480Z"/></svg>
+                    Day</button>
+                <button id="nighttrigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M484-80q-84 0-157.5-32t-128-86.5Q144-253 112-326.5T80-484q0-146 93-257.5T410-880q-18 99 11 193.5T521-521q71 71 165.5 100T880-410q-26 144-138 237T484-80Zm0-80q88 0 163-44t118-121q-86-8-163-43.5T464-465q-61-61-97-138t-43-163q-77 43-120.5 118.5T160-484q0 135 94.5 229.5T484-160Zm-20-305Z"/></svg>
+                    Night</button>
+            </div>
+            <div id="smallmap">
+                <div class="mapcontainer">
+                    <div class="mapimage"></div>
+                </div>
+            </div>
+            <div id="planetrigger">
+                <button id="plane-btn">Hide</button>
+                <div class="showcolors open">
+                    <div id="color1"><span></span>2BHK</div>
+                    <div id="color2"><span></span>3BHK</div>
+                    <div id="color3"><span></span>BOOKED</div>
+                </div>
+                
+            </div>
+        </div>
+        <div id="map-overlay" class="overlay">
+            <div class="modal">
+                <button id="close-map-btn" aria-label="Close Map">&times;</button>
+                <div class="iframe-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d2746.3441918861586!2d80.32900789195688!3d13.230512504829424!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1781359276067!5m2!1sen!2sin" width="1200" height="800" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+        <div id="details-container">
+            <div id="filter-container">
+                <div id="selection-btn">
+                    <select id="floorselection">
+                        <option>All Floors</option>
+                        <option>Floor 1</option>
+                        <option>Floor 2</option>
+                        <option>Floor 3</option>
+                        <option>Floor 4</option>
+                        <option>Floor 5</option>
+                        <option>Floor 6</option>
+                        <option>Floor 7</option>
+                        <option>Floor 8</option>
+                        <option>Floor 9</option>
+                        <option>Floor 10</option>
+                    </select>
+                    <button id="filter2bhk" class="bhkactive"><span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M120-120v-520l520-200v360h40q0-33 23.5-56.5T760-560q33 0 56.5 23.5T840-480v360H120Zm80-80h160v-280h200v-244L200-585v385Zm240 0h120v-120h80v120h120v-200H440v200ZM280-560Zm320 360Zm0-20Z"/></svg></span><span>2BHK</span></button>
+                    <button id="filter3bhk" class="bhkactive"><span><svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M120-120v-560h160v-160h400v320h160v400H520v-160h-80v160H120Zm80-80h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 320h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 480h80v-80h-80v80Zm0-160h80v-80h-80v80Z"/></svg></span><span>3BHK</span></button>
+                    
+                </div>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        [ ₹ <span id="min-val">1.30</span> Cr - <span id="max-val">2.50</span> Cr ]
+                    </div>
+                    <div class="range-slider">
+                        <div class="slider-track"></div>
+                        <input type="range" id="slider-1" min="1.3" max="2.5" step="0.05" value="1.3">
+                        <input type="range" id="slider-2" min="1.3" max="2.5" step="0.05" value="2.5">
+                    </div>
+                </div>
+            </div>
+            <div id="detail-container"></div>
+        </div>
+        
+    </div>
+    <script>
+        let allvideo = {
+            day: {
+                forward: ['video/Day/f1.webm', 'video/Day/f2.webm', 'video/Day/f3.webm', 'video/Day/f4.webm'],
+                backward: ['video/Day/r1.webm', 'video/Day/r2.webm', 'video/Day/r3.webm', 'video/Day/r4.webm']
+            },
+            night: {
+                forward: ['video/Night/f1.webm', 'video/Night/f2.webm', 'video/Night/f3.webm', 'video/Night/f4.webm'],
+                backward: ['video/Night/r1.webm', 'video/Night/r2.webm', 'video/Night/r3.webm', 'video/Night/r4.webm']
+            }
+            
+        };
+        
+        let alldetails = [
+            {
+                floor: 'Floor 1',
+                flats: [
+                    {
+                        id: 'Flat11', name: 'Flat 11', size: '1400 SQ.FT', floor: 'floor1', available: true, bhk: '2BHK', price: '1,60,00,000'
+                    },
+                    {
+                        id: 'Flat12', name: 'Flat 12', size: '1800 SQ.FT', floor: 'floor1', available: true, bhk: '3BHK', price: '2,00,00,000'
+                    },
+                    {
+                        id: 'Flat13', name: 'Flat 13', size: '1400 SQ.FT', floor: 'floor1', available: true, bhk: '2BHK', price: '1,60,00,000'
+                    },
+                    {
+                        id: 'Flat14', name: 'Flat 14', size: '1800 SQ.FT', floor: 'floor1', available: true, bhk: '3BHK', price: '2,00,00,000'
+                    },
+                    
+                ]
+            },
+            {
+                floor: 'Floor 2',
+                flats: [
+                    {
+                        id: 'Flat21', name: 'Flat 21', size: '1400 SQ.FT', floor: 'floor2', available: true, bhk: '2BHK', price: '1,55,00,000'
+                    },
+                    {
+                        id: 'Flat22', name: 'Flat 22', size: '1800 SQ.FT', floor: 'floor2', available: true, bhk: '3BHK', price: '1,85,00,000'
+                    },
+                    {
+                        id: 'Flat23', name: 'Flat 23', size: '1400 SQ.FT', floor: 'floor2', available: true, bhk: '2BHK', price: '1,55,00,000'
+                    },
+                    {
+                        id: 'Flat24', name: 'Flat 24', size: '1800 SQ.FT', floor: 'floor2', available: true, bhk: '3BHK', price: '1,85,00,000'
+                    },
+                ]
+            },
+            {
+                floor: 'Floor 3',
+                flats: [
+                    {
+                        id: 'Flat31', name: 'Flat 31', size: '1400 SQ.FT', floor: 'floor3', available: true, bhk: '2BHK', price: '1,35,00,000'
+                    },
+                    {
+                        id: 'Flat32', name: 'Flat 32', size: '1800 SQ.FT', floor: 'floor3', available: true, bhk: '3BHK', price: '1,70,00,000'
+                    },
+                    {
+                        id: 'Flat33', name: 'Flat 33', size: '1400 SQ.FT', floor: 'floor3', available: true, bhk: '2BHK', price: '1,35,00,000'
+                    },
+                    {
+                        id: 'Flat34', name: 'Flat 34', size: '1800 SQ.FT', floor: 'floor3', available: true, bhk: '3BHK', price: '1,70,00,000'
+                    },
+                ]
+            },
+            {
+                floor: 'Floor 4',
+                flats: [
+                    {
+                        id: 'Flat41', name: 'Flat 41', size: '1400 SQ.FT', floor: 'floor4', available: true, bhk: '2BHK', price: '1,30,00,000'
+                    },
+                    {
+                        id: 'Flat42', name: 'Flat 42', size: '1800 SQ.FT', floor: 'floor4', available: true, bhk: '3BHK', price: '1,85,00,000'
+                    },
+                    {
+                        id: 'Flat43', name: 'Flat 43', size: '1400 SQ.FT', floor: 'floor4', available: true, bhk: '2BHK', price: '1,30,00,000'
+                    },
+                    {
+                        id: 'Flat44', name: 'Flat 44', size: '1800 SQ.FT', floor: 'floor4', available: true, bhk: '3BHK', price: '1,85,00,000'
+                    },
+                ]
+            },
+            {
+                floor: 'Floor 5',
+                flats: [
+                    {
+                        id: 'Flat51', name: 'Flat 51', size: '1400 SQ.FT', floor: 'floor5', available: true, bhk: '2BHK', price: '1,35,00,000'
+                    },
+                    {
+                        id: 'Flat52', name: 'Flat 52', size: '1800 SQ.FT', floor: 'floor5', available: true, bhk: '3BHK', price: '1,90,00,000'
+                    },
+                    {
+                        id: 'Flat53', name: 'Flat 53', size: '1400 SQ.FT', floor: 'floor5', available: true, bhk: '2BHK', price: '1,35,00,000'
+                    },
+                    {
+                        id: 'Flat54', name: 'Flat 54', size: '1800 SQ.FT', floor: 'floor5', available: true, bhk: '3BHK', price: '1,90,00,000'
+                    },
+                ]
+            },
+            {
+                floor: 'Floor 6',
+                flats: [
+                    {
+                        id: 'Flat61', name: 'Flat 61', size: '1400 SQ.FT', floor: 'floor6', available: true, bhk: '2BHK', price: '1,45,00,000'
+                    },
+                    {
+                        id: 'Flat62', name: 'Flat 62', size: '1800 SQ.FT', floor: 'floor6', available: true, bhk: '3BHK', price: '2,10,00,000'
+                    },
+                    {
+                        id: 'Flat63', name: 'Flat 63', size: '1400 SQ.FT', floor: 'floor6', available: true, bhk: '2BHK', price: '1,45,00,000'
+                    },
+                    {
+                        id: 'Flat64', name: 'Flat 64', size: '1800 SQ.FT', floor: 'floor6', available: true, bhk: '3BHK', price: '2,10,00,000'
+                    },
+                ]
+            },
+            {
+                floor: 'Floor 7',
+                flats: [
+                    {
+                        id: 'Flat71', name: 'Flat 71', size: '1400 SQ.FT', floor: 'floor7', available: true, bhk: '2BHK', price: '1,50,00,000'
+                    },
+                    {
+                        id: 'Flat72', name: 'Flat 72', size: '1800 SQ.FT', floor: 'floor7', available: true, bhk: '3BHK', price: '2,20,00,000'
+                    },
+                    {
+                        id: 'Flat73', name: 'Flat 73', size: '1400 SQ.FT', floor: 'floor7', available: true, bhk: '2BHK', price: '1,50,00,000'
+                    },
+                    {
+                        id: 'Flat74', name: 'Flat 74', size: '1800 SQ.FT', floor: 'floor7', available: true, bhk: '3BHK', price: '2,20,00,000'
+                    },
+                ]
+            },
+            {
+                floor: 'Floor 8',
+                flats: [
+                    {
+                        id: 'Flat81', name: 'Flat 81', size: '1400 SQ.FT', floor: 'floor8', available: true, bhk: '2BHK', price: '1,60,00,000'
+                    },
+                    {
+                        id: 'Flat82', name: 'Flat 82', size: '1800 SQ.FT', floor: 'floor8', available: true, bhk: '3BHK', price: '2,30,00,000'
+                    },
+                    {
+                        id: 'Flat83', name: 'Flat 83', size: '1400 SQ.FT', floor: 'floor8', available: true, bhk: '2BHK', price: '1,60,00,000'
+                    },
+                    {
+                        id: 'Flat84', name: 'Flat 84', size: '1800 SQ.FT', floor: 'floor8', available: true, bhk: '3BHK', price: '2,30,00,000'
+                    },
+                ]
+            },
+            {
+                floor: 'Floor 9',
+                flats: [
+                    {
+                        id: 'Flat91', name: 'Flat 91', size: '1400 SQ.FT', floor: 'floor9', available: true, bhk: '2BHK', price: '1,75,00,000'
+                    },
+                    {
+                        id: 'Flat92', name: 'Flat 92', size: '1800 SQ.FT', floor: 'floor9', available: true, bhk: '3BHK', price: '2,40,00,000'
+                    },
+                    {
+                        id: 'Flat93', name: 'Flat 93', size: '1400 SQ.FT', floor: 'floor9', available: true, bhk: '2BHK', price: '1,75,00,000'
+                    },
+                    {
+                        id: 'Flat94', name: 'Flat 94', size: '1800 SQ.FT', floor: 'floor9', available: true, bhk: '3BHK', price: '2,40,00,000'
+                    },
+                ]
+            },
+            {
+                floor: 'Floor 10',
+                flats: [
+                    {
+                        id: 'Flat101', name: 'Flat 101', size: '1400 SQ.FT', floor: 'floor10', available: true, bhk: '2BHK', price: '1,80,00,000'
+                    },
+                    {
+                        id: 'Flat102', name: 'Flat 102', size: '1800 SQ.FT', floor: 'floor10', available: true, bhk: '3BHK', price: '2,50,00,000'
+                    },
+                    {
+                        id: 'Flat103', name: 'Flat 103', size: '1400 SQ.FT', floor: 'floor10', available: true, bhk: '2BHK', price: '1,80,00,000'
+                    },
+                    {
+                        id: 'Flat104', name: 'Flat 104', size: '1800 SQ.FT', floor: 'floor10', available: true, bhk: '3BHK', price: '2,50,00,000'
+                    },
+                ]
+            },
+        ];
+        let maincontainer = document.querySelector('.main-container');
+        let container = document.querySelector('.container');
+        let img = document.querySelector('.child-container');
+        let mainvideo = document.querySelector('#main-video');
+        let canvas = document.querySelector('#freeze-canvas');
+        let ctx = canvas.getContext('2d');
+        let leftbtn = document.querySelector('#left-btn');
+        let rightbtn = document.querySelector('#right-btn');
+        let currentstep = 0;
+        let timing = 'day';
+        let totalsteps = 4;
+        let isplaying = false;
+        let currentRotation = 0;
+        let floor = document.querySelectorAll('.floor');
+        let daytrigger = document.querySelector('#daytrigger');
+        let nighttrigger = document.querySelector('#nighttrigger');
+        let planecontainer = document.querySelector('.plane-container');
+        let planebtn = document.querySelector('#plane-btn');
+        let smallmap = document.querySelector('#smallmap');
+        let mapimage = document.querySelector('.mapimage');
+        let showcolors = document.querySelector('.showcolors');
+        let planebtnclick = true;
+        let color1 = document.querySelector('#color1');
+        let color2 = document.querySelector('#color2');
+        let color3 = document.querySelector('#color3');
+        let detailcontainer = document.querySelector('#detail-container');
+        let filter2bhk = document.querySelector('#filter2bhk');
+        let filter3bhk = document.querySelector('#filter3bhk');
+        let bhk2 = document.querySelectorAll('.bhk2');
+        let bhk3 = document.querySelectorAll('.bhk3');
+        let front = document.querySelectorAll('.front');
+        let left = document.querySelectorAll('.left');
+        let right = document.querySelectorAll('.right');
+        let back = document.querySelectorAll('.back');
+        let isDragging = false;
+
+
+        const slider1 = document.getElementById("slider-1");
+        const slider2 = document.getElementById("slider-2");
+        const minVal = document.getElementById("min-val");
+        const maxVal = document.getElementById("max-val");
+        const sliderContainer = document.querySelector(".range-slider");
+
+        const floorSelect = document.getElementById('floorselection');
+
+        let activeBhkFilters = {
+            '2BHK': filter2bhk.classList.contains('bhkactive'),
+            '3BHK': filter3bhk.classList.contains('bhkactive')
+        };
+
+        function applyFilters() {
+            // 1. Resolve Range Slider values (handles inversion gracefully)
+            const val1 = parseFloat(slider1.value);
+            const val2 = parseFloat(slider2.value);
+            const minPrice = Math.min(val1, val2);
+            const maxPrice = Math.max(val1, val2);
+
+            // Update range labels dynamically
+            minVal.textContent = minPrice.toFixed(2);
+            maxVal.textContent = maxPrice.toFixed(2);
+
+            // 2. Resolve selected floor criteria
+            const selectedFloor = floorSelect.value; // "All Floors", "Floor 1", etc.
+
+            let floorVisibilityTracker = {};
+
+            // 3. Loop through every Floor container (<details>)
+            const floorContainers = document.querySelectorAll('.singlefloor');
+            
+            floorContainers.forEach(floorEl => {
+                const floorName = floorEl.getAttribute('data-floor');
+                const floorIdClean = floorName.toLowerCase().replace(/\s+/g, '');
+                const flatItems = floorEl.querySelectorAll('.lilist');
+                let visibleFlatsCount = 0;
+            
+                // Loop through flats inside this floor block
+                flatItems.forEach(flat => {
+                    const flatBhk = flat.getAttribute('data-bhk');
+                    const flatPrice = parseFloat(flat.getAttribute('data-price'));
+                    const flatId = flat.querySelector('.licontainer').getAttribute('id');
+                
+                    // Check if flat clears individual filters
+                    const matchesBhk = activeBhkFilters[flatBhk];
+                    const matchesPrice = (flatPrice >= minPrice && flatPrice <= maxPrice);
+
+                    const matching3DPlanes = document.querySelectorAll(`.plane-container [data-flat-id="${flatId}" `);
+            
+                    if (matchesBhk && matchesPrice) {
+                        flat.classList.remove('is-hidden');
+                        // setTimeout(() => {
+                        //     flat.style.display = ''; // Shows standard styling 
+                        // }, 300);
+                        
+                        matching3DPlanes.forEach(plane => {
+                            plane.classList.remove('is-hidden-3d');
+                        });
+                        visibleFlatsCount++;
+                    } else {
+                        flat.classList.add('is-hidden');
+                        // setTimeout(() => {
+                        //     flat.style.display = 'none'; // Shows standard styling 
+                        // }, 300);
+                        //console.log(matching3DPlanes);
+                        matching3DPlanes.forEach(plane => {
+                            plane.classList.add('is-hidden-3d');
+                        });
+                    }
+                });
+            
+                // Determine if the entire floor block remains visible
+                const matchesFloorDropdown = (selectedFloor === 'All Floors' || floorName === selectedFloor);
+
+                // Hide floor if it doesn't match dropdown selector OR has zero matching flats inside
+                if (matchesFloorDropdown && visibleFlatsCount > 0) {
+                    //console.log(floorEl);
+                    floorEl.classList.remove('is-hidden');
+                    // floorEl.style.display = '';
+                    
+                    // Optional: Automatically open accordion view if a single floor is targeted
+                    if (selectedFloor !== 'All Floors') {
+                        floorEl.open = true;
+                    }
+                    floorVisibilityTracker[floorIdClean] = true;
+                } else {
+                    floorEl.classList.add('is-hidden');
+                    
+                    // floorEl.style.display = 'none';
+
+                    // if (floorEl.open) {
+                    //         setTimeout(() => { if (floorEl.classList.contains('is-hidden')) floorEl.open = false;
+                    //     }, 500);
+                    // }
+                    floorVisibilityTracker[floorIdClean] = false;
+                }
+            });
+            for (let i = 1; i <= 10; i++) {
+                const floorClassKey = `floor${i}`;
+                const target3DFloorElement = document.querySelectorAll(`.plane-container .${floorClassKey} > div`);
+
+                if (target3DFloorElement) {
+                    if (floorVisibilityTracker[floorClassKey] === true) {
+                        target3DFloorElement.forEach((singleside) => {
+                            singleside.classList.remove('is-hidden-3d');
+                        })
+                    }
+                    else if (floorVisibilityTracker[floorClassKey] !== true) {
+                        //console.log(target3DFloorElement);
+                        target3DFloorElement.forEach((singleside) => {
+                            singleside.classList.add('is-hidden-3d');
+                        })
+                    }
+                    
+                }
+            }
+        }
+
+        // --- Wire Up Event Listeners ---
+
+        // Dropdown update
+        floorSelect.addEventListener('change', applyFilters);
+
+        filter2bhk.addEventListener('click', function() {
+            //console.log(this)
+            this.classList.toggle('bhkactive');
+            activeBhkFilters['2BHK'] = this.classList.contains('bhkactive');
+            applyFilters();
+        });
+        filter3bhk.addEventListener('click', function() {
+            //console.log(this)
+            this.classList.toggle('bhkactive');
+            activeBhkFilters['3BHK'] = this.classList.contains('bhkactive');
+            applyFilters();
+        })
+        
+        function updateSliders(e) {
+            let val1 = parseFloat(slider1.value);
+            let val2 = parseFloat(slider2.value);
+            //console.log(val1, val2);
+            // 1. PREVENT PENETRATION (Crossing)
+            if (val1 >= val2) {
+              // Check WHICH slider triggered the event so we adjust the correct one
+              if (e && e.target === slider1) {
+                // User dragged the minimum slider too far right
+                slider1.value = val2 - 0.05;
+                val1 = val2 - 0.05;
+              } else if (e && e.target === slider2) {
+                // User dragged the maximum slider too far left
+                slider2.value = val1 + 0.05;
+                val2 = val1 + 0.05;
+              }
+              
+            }
+            
+            // Update the text values
+            minVal.textContent = val1.toFixed(1);
+            maxVal.textContent = val2.toFixed(1);
+            //console.log(val1, val2);
+            applyFilters();
+            // (If you added the CSS track highlight from the previous step, update its width here!)
+        }
+
+        // 2. CLICK ANYWHERE TO MOVE NEAREST SLIDER
+        sliderContainer.addEventListener("click", function(e) {
+            // Ignore the click if the user is actively clicking/dragging the actual handle
+            if (e.target.tagName.toLowerCase() === 'input') return;
+            
+            // Calculate the click position relative to the container's width
+            const rect = sliderContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickPercent = clickX / rect.width;
+            
+            // Convert that percentage into an actual slider value
+            const minLimit = parseFloat(slider1.min);
+            const maxLimit = parseFloat(slider1.max);
+            const clickedValue = minLimit + (clickPercent * (maxLimit - minLimit));
+            
+            let val1 = parseFloat(slider1.value);
+            let val2 = parseFloat(slider2.value);
+            
+            // Find out which slider is mathematically closer to the clicked value
+            const distanceToSlider1 = Math.abs(clickedValue - val1);
+            const distanceToSlider2 = Math.abs(clickedValue - val2);
+            
+            // Move the closest slider
+            if (distanceToSlider1 <= distanceToSlider2) {
+                slider1.value = clickedValue;
+            } else {
+                slider2.value = clickedValue;
+            }
+            // Manually update the text and visual limits
+            updateSliders();
+        });
+
+        // Attach listeners to both inputs
+        slider1.addEventListener("input", updateSliders);
+        slider2.addEventListener("input", updateSliders);
+        
+        
+        //console.log(bhk2, bhk3)
+        daytrigger.addEventListener('click', () => {
+            if(timing == 'day') return
+            timing = 'day';
+            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
+            daytrigger.classList.add('tactive');
+            nighttrigger.classList.remove('tactive');
+            maincontainer.style.backgroundImage = 'url(images/BGDay.webp)';
+            mapimage.style.backgroundImage = 'url(images/minimap.webp)';
+            smallmap.classList.remove('night');
+        })
+        nighttrigger.addEventListener('click', () => {
+            if(timing == 'night') return
+            timing = 'night';
+            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
+            daytrigger.classList.remove('tactive');
+            nighttrigger.classList.add('tactive');
+            maincontainer.style.backgroundImage = 'url(images/BGNight.webp)';
+            mapimage.style.backgroundImage = 'url(images/minimap_Night.webp)';
+            smallmap.classList.add('night');
+        })
+        // console.log(allvideo[timing].forward);
+        planebtn.addEventListener('click', function() {
+            if(!planebtnclick) {
+                planebtnclick = true;
+                showcolors.classList.add('open');
+                showcolors.classList.remove('close');
+                this.innerText = 'Hide';
+                planecontainer.classList.remove('is-hidden-3d');
+            }
+            else if(planebtnclick) {
+                planebtnclick = false;
+                showcolors.classList.remove('open');
+                showcolors.classList.add('close');
+                this.innerText = 'Show Flats';
+                planecontainer.classList.add('is-hidden-3d');
+            }
+        });
+        const mapOverlay = document.getElementById('map-overlay');
+        const closeBtn = document.getElementById('close-map-btn');
+
+        // Open the overlay
+        smallmap.addEventListener('click', () => {
+            mapOverlay.classList.add('active');
+        });
+      
+        // Close the overlay using the close button
+        closeBtn.addEventListener('click', () => {
+            mapOverlay.classList.remove('active');
+        });
+      
+        // Close the overlay when clicking on the dark background
+        mapOverlay.addEventListener('click', (e) => {
+            if (e.target === mapOverlay) {
+                mapOverlay.classList.remove('active');
+            }
+        });
+
+        const floorcontainer = document.querySelector('.floor-container');
+        function playWithCanvasBuffer(newSrc, p, currentRotation) {
+            canvas.width = mainvideo.videoWidth;
+            canvas.height = mainvideo.videoHeight;
+            // below code freeze the last frame in canvas
+            ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            mainvideo.src = newSrc;
+            mainvideo.load();
+            console.log(p)
+            if(p === 'play') {
+                canvas.style.opacity = 1;
+                mainvideo.onloadeddata = () => {
+                mainvideo.play().then(() => {
+                    floor.forEach(f => {
+                        //console.log(f)
+                        f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
+                    })
+                    
+                    // 6. Once the new video is actually playing, hide the canvas
+                    setTimeout(() => {
+                        canvas.style.opacity = 0;
+                    }, 100)
+                }).catch(err => {
+                    console.error("Autoplay prevented or error:", err);
+                });
+
+                    // Clear the listener
+                    mainvideo.onloadeddata = null;
+                };
+            }
+            if(p === 'pause') {
+                canvas.style.opacity = 1;
+                mainvideo.onloadeddata = () => {
+                    // 6. Once the new video is actually playing, hide the canvas
+                    canvas.animate(
+                        [{ opacity: 1 }, { opacity: 0 }],
+                        { duration: 500, easing: 'ease' }
+                        ).onfinish = () => {
+                        canvas.style.opacity = 0;
+                    };
+                    // Clear the listener
+                    mainvideo.onloadeddata = null;
+                };
+            }
+            
+        }
+        
+        function moveLeft() {
+            if (isplaying) return;
+            setPlayingState(true);
+            updateTransform(1);
+            currentRotation += 90; // Rotate right
+            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'play', currentRotation);
+            currentstep = (currentstep + 1) % totalsteps;
+        }
+        function moveRight() {
+            if (isplaying) return;
+            setPlayingState(true);
+            updateTransform(1);
+            currentRotation -= 90; // Rotate left
+            let prevstep = (currentstep - 1 + totalsteps) % totalsteps;
+            playWithCanvasBuffer(allvideo[timing].backward[prevstep], 'play', currentRotation);
+            currentstep = prevstep;
+        }
+        function setPlayingState(state) {
+            console.log(state)
+            if(state === true) {
+                daytrigger.style.cursor = 'default';
+                nighttrigger.style.cursor = 'default';
+                leftbtn.style.cursor = 'default';
+                rightbtn.style.cursor = 'default';
+            }
+            if(state === false) {
+                daytrigger.style.cursor = 'pointer';
+                nighttrigger.style.cursor = 'pointer';
+                leftbtn.style.cursor = 'pointer';
+                rightbtn.style.cursor = 'pointer';
+                
+            }
+            isplaying = state;
+            leftbtn.disabled = state;
+            rightbtn.disabled = state;
+            daytrigger.disabled = state;
+            nighttrigger.disabled = state;
+        }
+        leftbtn.addEventListener('click', moveLeft);
+        rightbtn.addEventListener('click', moveRight);
+        mainvideo.addEventListener('ended', () => {
+            setPlayingState(false);
+        })
+        mainvideo.src = allvideo[timing].forward[0];
+        mainvideo.currentTime = 0;
+        createDetails();
+        function createDetails() {
+            alldetails.forEach(function (ad) {
+                let singlefloor = document.createElement('details');
+                singlefloor.className = `singlefloor`;
+                singlefloor.setAttribute('data-floor', ad.floor);
+                singlefloor.innerHTML = `
+                        <summary class="FloorHead">
+                            <h2><span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -1050 960 960" width="24px" fill="#1f1f1f"><path d="M480-400 40-640l440-240 440 240-440 240Zm0 160L63-467l84-46 333 182 333-182 84 46-417 227Zm0 160L63-307l84-46 333 182 333-182 84 46L480-80Zm0-411 273-149-273-149-273 149 273 149Zm0-149Z"/></svg></span><span>${ad.floor}</span></h2>
+                            <div><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M480-200 240-440l56-56 184 183 184-183 56 56-240 240Zm0-240L240-680l56-56 184 183 184-183 56 56-240 240Z"/></svg></div>
+                        </summary>`;
+                        let ullist = document.createElement('ul');
+                        ullist.className = 'ullist';
+                        singlefloor.append(ullist);
+                        ad.flats.forEach(function (af) {
+                            //console.log(af.id)
+                            let lilist = document.createElement('li');
+                            lilist.className = 'lilist';
+                            lilist.setAttribute('data-bhk', af.bhk);
+                            let priceInCrores = parseFloat(af.price.replace(/,/g, '')) / 10000000;
+                            lilist.setAttribute('data-price', priceInCrores);
+                            lilist.innerHTML = `<div class="licontainer" id="${af.id}">
+                                        <div class="seg0">
+                                            <h3>${af.name}</h3>
+                                            <div>
+                                                <button onclick="wishlistAdd(${af.id})"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/></svg></button>
+                                                <div class="selecticon"></div>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="seg1">
+                                            <p><span><svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="#1f1f1f"><path d="M120-120v-320h80v184l504-504H520v-80h320v320h-80v-184L256-200h184v80H120Z"/></svg></span> ${af.size}</p>
+                                            <p><span><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -1100 960 960" width="18px" fill="#1f1f1f"><path d="M80-200v-240q0-27 11-49t29-39v-112q0-50 35-85t85-35h160q23 0 43 8.5t37 23.5q17-15 37-23.5t43-8.5h160q50 0 85 35t35 85v112q18 17 29 39t11 49v240h-80v-80H160v80H80Zm440-360h240v-80q0-17-11.5-28.5T720-680H560q-17 0-28.5 11.5T520-640v80Zm-320 0h240v-80q0-17-11.5-28.5T400-680H240q-17 0-28.5 11.5T200-640v80Zm-40 200h640v-80q0-17-11.5-28.5T760-480H200q-17 0-28.5 11.5T160-440v80Zm640 0H160h640Z"/></svg></span> ${af.bhk}</p>
+                                        </div>
+                                        <div class="seg2">
+                                            <p><span id="aid${af.id}">${checkA(af.available, af.id)}</span><span>${checkF(af.available)}</span></p>
+                                        </div>
+                                        <div class="seg3">
+                                            <p>₹ <span>${checkP(af.price)}</span> Cr</p>
+                                        </div>
+                                        <div class="seg4">
+                                            <button onclick="showInterior${af.id}">View Interior</button>
+                                        </div>
+                                </div>`
+                            ullist.append(lilist);
+                        })
+                detailcontainer.append(singlefloor);
+            });
+        }
+        function checkA(ca, id) {
+            //console.log(ca, id)
+            setTimeout(() => {
+                let aid = document.querySelector(`#aid${id}`);
+                aid.style.width = '10px';
+                aid.style.borderRadius = '50%';
+                aid.style.height = '10px';
+                aid.style.display = 'inline-block';
+                if (ca === true) {
+                    aid.style.backgroundColor = 'Green';
+                    aid.style.boxShadow = '0px 0px 3px rgba(0, 128, 0, 1)';
+                }
+                else if (ca === false) {
+                    aid.style.backgroundColor = 'Red';
+                }
+            }, 5);
+            return ' ';
+        }
+        function checkF(cf) {
+            if (cf === true) {
+                return 'Available';
+            }
+            else if (cf === false) {
+                return 'Booked';
+            }
+        }
+        function checkP(cp, decimals = 2) {
+            // Accept element nodes (use their .value)
+            // if (cp instanceof Element && 'value' in cp) cp = cp.value;
+
+            // if (cp == null) return null;
+
+            // Normalize to string and remove commas, currency symbols, spaces
+            const cleaned = String(cp).trim().replace(/[,₹$€£]|Rs\.?/g, '');
+
+            if (cleaned === '') return null;
+
+            const n = Number(cleaned);
+            if (!Number.isFinite(n)) return null;
+
+            return parseFloat((n / 10_000_000).toFixed(decimals));
+        }
+        let sf = document.querySelector('.singlefloor');
+        sf.open = true;
+        bhk2.forEach(function(b2) {
+            let outerAffects = `<div class="arc lefts inner"></div>
+                                <div class="arc lefts outer"></div>
+                                <div class="arc rights inner"></div>
+                                <div class="arc rights outer"></div>`;
+            b2.innerHTML += outerAffects;
+            b2.addEventListener('click', function (e) {
+                console.log(this.innerText);
+                let resultIt = `${this.innerText}`.split(" ").join("");
+                findDetails(resultIt);
+            })
+        })
+        bhk3.forEach(function(b3) {
+            let outerAffects = `<div class="arc lefts inner"></div>
+                                <div class="arc lefts outer"></div>
+                                <div class="arc rights inner"></div>
+                                <div class="arc rights outer"></div>`;
+            b3.innerHTML += outerAffects;
+            if(isDragging) {
+
+            }
+            b3.addEventListener('click', function (e) {
+                //console.log(this.innerText);
+                let resultIt = `${this.innerText}`.split(" ").join("");
+                findDetails(resultIt);
+            })
+        })
+        let arcinner = document.querySelectorAll('.inner');
+        let arcouter = document.querySelectorAll('.outer');
+        function syncWidth() {
+            console.log('sync width called');
+            let pcHeight = planecontainer.clientHeight;
+            planecontainer.style.perspective = `${pcHeight * 1.425}px`;
+            let multiplierw1 = 0.41;
+            let multiplierh1 = 0.05;
+            let distance1 = 0.215;
+            
+            front.forEach(function (fr) {
+                fr.style.width = `${pcHeight * multiplierw1}px`;
+                fr.style.height = `${pcHeight * multiplierh1}px`;
+                bhk2.forEach((b2) => {
+                    b2.style.lineHeight = `${pcHeight * multiplierh1 * 0.85}px`;
+                })
+                bhk3.forEach((b3) => {
+                    b3.style.lineHeight = `${pcHeight * multiplierh1 * 0.85}px`;
+                })
+                fr.style.transform = `rotateY(0deg) translateZ(${pcHeight * distance1}px)`;
+            })
+            left.forEach(function (lt) {
+                lt.style.width = `${pcHeight * multiplierw1}px`;
+                lt.style.height = `${pcHeight * multiplierh1}px`;
+                bhk2.forEach((b2) => {
+                    b2.style.lineHeight = `${pcHeight * multiplierh1 * 0.85}px`;
+                })
+                bhk3.forEach((b3) => {
+                    b3.style.lineHeight = `${pcHeight * multiplierh1 * 0.85}px`;
+                })
+                lt.style.transform = `rotateY(90deg) translateX(3px) translateZ(${pcHeight * distance1}px)`;
+            })
+            back.forEach(function (bk) {
+                bk.style.width = `${pcHeight * multiplierw1}px`;
+                bk.style.height = `${pcHeight * multiplierh1}px`;
+                bhk2.forEach((b2) => {
+                    b2.style.lineHeight = `${pcHeight * multiplierh1 * 0.85}px`;
+                })
+                bhk3.forEach((b3) => {
+                    b3.style.lineHeight = `${pcHeight * multiplierh1 * 0.85}px`;
+                })
+                bk.style.transform = `rotateY(180deg) translateX(2px) translateZ(${pcHeight * distance1}px)`;
+            })
+            right.forEach(function (rt) {
+                rt.style.width = `${pcHeight * multiplierw1}px`;
+                rt.style.height = `${pcHeight * multiplierh1}px`;
+                bhk2.forEach((b2) => {
+                    b2.style.lineHeight = `${pcHeight * multiplierh1 * 0.85}px`;
+                })
+                bhk3.forEach((b3) => {
+                    b3.style.lineHeight = `${pcHeight * multiplierh1 * 0.85}px`;
+                })
+                rt.style.transform = `rotateY(270deg) translateZ(${pcHeight * distance1}px)`;
+            })
+            
+            arcinner.forEach((ai) => {
+                //console.log(`${pcHeight * multiplierh1}`)
+                ai.style.width = `${pcHeight * multiplierh1 * 0.7}px`;
+                ai.style.height = `${pcHeight * multiplierh1 * 1}px`;
+            });
+            arcouter.forEach((ao) => {
+                ao.style.width = `${pcHeight * multiplierh1 * 0.95}px`;
+                ao.style.height = `${pcHeight * multiplierh1 * 1.2}px`;
+            })
+            
+        }
+        let lastHeight, lastWidth;
+        const observer = new ResizeObserver(([entry]) => {
+            // let newWidth = entry.contentRect.width;
+            // if (newWidth !== lastWidth) {
+            //     console.log(smallmap)
+            //     lastWidth = newWidth;
+            //     smallmap.style.width = `${newWidth * 0.1}px`;
+            //     smallmap.style.height = `${newWidth * 0.1}px`;
+            // }
+            let newHeight = entry.contentRect.height;
+            if (newHeight !== lastHeight) {
+                lastHeight = newHeight;
+                syncWidth();
+                // smallmap.style.width = `${newHeight * 0.125}px`;
+                // smallmap.style.height = `${newHeight * 0.125}px`;
+            }
+        });
+        observer.observe(planecontainer);
+
+        let itelement, selecticon;
+        function findDetails(iT) {
+            if (itelement != undefined) {
+                itelement.classList.remove('lactive');
+            }
+            if (selecticon != undefined) {
+                selecticon.classList.remove('sactive');
+            }
+            itelement = document.querySelector(`#${iT}`);
+            selecticon = document.querySelector(`#${iT} .selecticon`);
+            console.log(selecticon);
+            let cd = itelement.closest('details');
+            //console.log(cd);
+            if (cd) {
+                cd.open = true;
+                setTimeout(() => {
+                    sDetails();
+                }, 350)
+            }
+            
+            function sDetails() {
+                let offset = 50;
+                console.log(itelement);
+                itelement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                selecticon.classList.add('sactive');
+                itelement.classList.add('lactive');
+            }
+            
+        }
+        
+        let scale = 1;
+        let posX = 0;
+        let posY = 0;
+        let startX = 0;
+        let startY = 0;
+        let startDistance = 0;
+        let startScale = 1;
+        let zoom = 3.0;
+        function updateTransform(s) {
+            let containerRect = container.getBoundingClientRect();
+            let imgWidth = img.offsetWidth;
+            let imgHeight = img.offsetHeight;
+            //console.log(containerRect, imgWidth, imgHeight)
+            let maxTransX = Math.max(0, (imgWidth * scale - containerRect.width) / 2);
+            let maxTransY = Math.max(0, (imgHeight * scale - containerRect.height) / 2);
+
+            posX = Math.max(Math.min(posX, maxTransX), -maxTransX);
+            posY = Math.max(Math.min(posY, maxTransY), -maxTransY);
+            //console.log(posX, posY, s);
+            if (s === 1) {
+                scale = 1;
+                posX = 0;
+                posY = 0;
+            }
+            img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+
+            if (scale > 1) {
+                container.style.cursor = isDragging ? 'grabbing' : 'grab';
+                container.style.touchAction = 'none'; // Lock HTML page scrolling
+            } else {
+                container.style.cursor = 'default';
+                container.style.touchAction = 'auto'; // Unlock HTML page scrolling
+            }
+        }
+        
+        container.addEventListener('wheel', (e) => {
+            if (scale === 1 && e.deltaY > 0) {
+                return
+            }
+            e.preventDefault(); // Stop page from scrolling
+            img.classList.remove('tracking');
+            const zoomSpeed = 0.15;
+            const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed;
+            const newScale = Math.max(1, Math.min(scale + delta, zoom)); // Limit zoom between 1x and 8x
+
+            // Math to zoom exactly towards the mouse cursor
+            if (newScale !== scale) {
+                const rect = container.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left - rect.width / 2;
+                const mouseY = e.clientY - rect.top - rect.height / 2;
+
+                const ratio = newScale / scale;
+                posX = mouseX - (mouseX - posX) * ratio;
+                posY = mouseY - (mouseY - posY) * ratio;
+            }
+
+            scale = newScale;
+            
+            // Reset position fully if returning to default scale
+            if (scale === 1) { posX = 0; posY = 0; }
+            
+            updateTransform();
+        }, { passive: false });
+        container.addEventListener('mousedown', (e) => {
+            if (scale > 1) {
+                isDragging = true;
+                img.classList.add('tracking');
+                startX = e.clientX - posX;
+                startY = e.clientY - posY;
+                updateTransform();
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                posX = e.clientX - startX;
+                posY = e.clientY - startY;
+                updateTransform();
+                bhk2.forEach((b2) => {
+                    b2.style.pointerEvents = 'none';
+                })
+                bhk3.forEach((b3) => {
+                    b3.style.pointerEvents = 'none';
+                })
+            }
+            if (!isDragging) {
+                bhk2.forEach((b2) => {
+                    if (planecontainer.classList.contains('is-hidden-3d')) {
+                        b2.style.pointerEvents = 'none';
+                    }
+                    else if (b2.parentElement.classList.contains('is-hidden-3d')) {
+                        b2.style.pointerEvents = 'none';
+                    }
+                    else if (b2.classList.contains('is-hidden-3d')) {
+                        b2.style.pointerEvents = 'none';
+                    }
+                })
+                bhk3.forEach((b3) => {
+                    if (planecontainer.classList.contains('is-hidden-3d')) {
+                        b3.style.pointerEvents = 'none';
+                    }
+                    else if (b3.parentElement.classList.contains('is-hidden-3d')) {
+                        b3.style.pointerEvents = 'none';
+                    }
+                    else if (b3.classList.contains('is-hidden-3d')) {
+                        b3.style.pointerEvents = 'none';
+                    }
+                })
+            }
+        });
+        // check it run all the time...
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            img.classList.remove('tracking');
+            updateTransform();
+            bhk2.forEach((b2) => {
+                if (b2.parentElement.classList.contains('is-hidden-3d')) return
+                if (b2.classList.contains('is-hidden-3d')) return
+                b2.style.pointerEvents = 'visible';
+            })
+            bhk3.forEach((b3) => {
+                if (b3.parentElement.classList.contains('is-hidden-3d')) return
+                if (b3.classList.contains('is-hidden-3d')) return
+                b3.style.pointerEvents = 'visible';
+                //console.log(b3, 'called')
+            })
+        });
+        container.addEventListener('touchstart', (e) => {
+            img.classList.add('tracking');
+            if (e.touches.length === 2) {
+                // Two fingers: Setup Pinch Zoom
+                e.preventDefault();
+                startDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                startScale = scale;
+            } else if (e.touches.length === 1 && scale > 1) {
+                // One finger & Zoomed in: Setup Panning
+                isDragging = true;
+                startX = e.touches[0].clientX - posX;
+                startY = e.touches[0].clientY - posY;
+            }
+        }, { passive: false });
+        container.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                // Two fingers: Execute Pinch Zoom
+                e.preventDefault();
+                const currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const delta = currentDistance / startDistance;
+                scale = Math.max(1, Math.min(startScale * delta, zoom)); // Limit zoom
+
+                if (scale === 1) { posX = 0; posY = 0; }
+                updateTransform();
+            } else if (e.touches.length === 1 && isDragging && scale > 1) {
+                // One finger & Zoomed in: Execute Panning
+                e.preventDefault(); // Stop HTML page from trying to scroll
+                posX = e.touches[0].clientX - startX;
+                posY = e.touches[0].clientY - startY;
+                updateTransform();
+            }
+            // Note: If touches.length === 1 and scale === 1, we do nothing. 
+            // The browser takes over and naturally scrolls the HTML page.
+        }, { passive: false });
+
+        container.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) startDistance = 0;
+            if (e.touches.length === 0) {
+                isDragging = false;
+                img.classList.remove('tracking');
+            }
+            updateTransform();
+        });
+        syncWidth();
+        updateSliders();
+        applyFilters();
+    </script>
+</body>
+</html>
