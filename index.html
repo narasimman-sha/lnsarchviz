@@ -1184,7 +1184,7 @@
     <div class="main-container">
         <div class="container">
             <div class="child-container">
-            <video id="main-video" onloadedmetadata="this.playbackRate = 1.0;" muted></video>
+            <video id="main-video" onloadedmetadata="this.playbackRate = 1.0;" playsinline webkit-playsinline muted disabledPictureInPicture></video>
             <!-- <video id="background-video" src="video/Clouds1.mp4" onloadedmetadata="this.playbackRate = 0.5;" autoplay loop muted></video> -->
             <canvas id="freeze-canvas"></canvas>
             
@@ -1922,6 +1922,7 @@
         });
 
         const floorcontainer = document.querySelector('.floor-container');
+        playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
             canvas.width = mainvideo.videoWidth;
             canvas.height = mainvideo.videoHeight;
