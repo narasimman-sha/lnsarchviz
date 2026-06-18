@@ -1935,6 +1935,7 @@
                 canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
                 mainvideo.play().then(() => {
+                    if (mainvideo.play) {
                     floor.forEach(f => {
                         //console.log(f)
                         f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
@@ -1944,6 +1945,7 @@
                     setTimeout(() => {
                         canvas.style.opacity = 0;
                     }, 100)
+                    }    
                 }).catch(err => {
                     console.error("Autoplay prevented or error:", err);
                 });
@@ -1955,7 +1957,7 @@
             if(p === 'pause') {
                 canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
-                    mainvideo.currentTime = 0.01;
+                    mainvideo.currentTime = 0;
                     // 6. Once the new video is actually playing, hide the canvas
                     canvas.animate(
                         [{ opacity: 1 }, { opacity: 0 }],
