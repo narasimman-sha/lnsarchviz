@@ -1954,6 +1954,7 @@
             if(p === 'pause') {
                 canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
+                    mainvideo.currentTime = 0.001;
                     // 6. Once the new video is actually playing, hide the canvas
                     canvas.animate(
                         [{ opacity: 1 }, { opacity: 0 }],
