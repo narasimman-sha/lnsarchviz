@@ -1115,6 +1115,7 @@
             #details-container {
                 flex: 1 1 85vh;
                 width: 100%;
+                /* overflow-y: unset; */
             }
             #filter-container {
                 font-size: 14px;
@@ -1922,31 +1923,48 @@
         });
 
         const floorcontainer = document.querySelector('.floor-container');
-        playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
+        
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
             canvas.width = mainvideo.videoWidth;
             canvas.height = mainvideo.videoHeight;
             // below code freeze the last frame in canvas
             ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            console.log(newSrc);
             mainvideo.src = newSrc;
             mainvideo.load();
             console.log(p)
             if(p === 'play') {
                 canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
-                mainvideo.play().then(() => {
-                    if (mainvideo.play) {
-                    floor.forEach(f => {
-                        //console.log(f)
-                        f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
-                    })
+                
+                if ('requestVideoFrameCallback' in mainvideo) {
+                mainvideo.requestVideoFrameCallback(() => {
+                    // This runs EXACTLY when the first new frame renders!
+                    console.log("First frame officially rendered:", mainvideo.currentTime);
                     
-                    // 6. Once the new video is actually playing, hide the canvas
-                    setTimeout(() => {
-                        canvas.style.opacity = 0;
-                    }, 100)
-                    }    
-                }).catch(err => {
+                    floor.forEach(f => {
+                        f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
+                    });
+                    
+                    // Smoothly hide the canvas now that video is visible
+                    canvas.style.opacity = 0;
+                    });
+                }
+                else {
+                    mainvideo.play().then(() => {
+                        console.log(mainvideo.currentTime)
+                        floor.forEach(f => {
+                            //console.log(f)
+                            f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
+                        })
+                    
+                        // 6. Once the new video is actually playing, hide the canvas
+                        setTimeout(() => {
+                            canvas.style.opacity = 0;
+                        }, 50)
+                })
+                }
+                mainvideo.play().catch(err => {
                     console.error("Autoplay prevented or error:", err);
                 });
 
@@ -1958,6 +1976,7 @@
                 canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
                     mainvideo.currentTime = 0;
+                    console.log(mainvideo.currentTime);
                     // 6. Once the new video is actually playing, hide the canvas
                     canvas.animate(
                         [{ opacity: 1 }, { opacity: 0 }],
@@ -2432,6 +2451,7 @@
             updateTransform();
         });
         syncWidth();
+        playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
         updateSliders();
         applyFilters();
     </script>
