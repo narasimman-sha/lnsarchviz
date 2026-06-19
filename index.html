@@ -44,6 +44,7 @@
             aspect-ratio: 3 / 2;
             overflow: hidden;
             border-radius: 20px;
+            will-change: transform;
         }
         .container .child-container {
             position: absolute;
@@ -53,6 +54,7 @@
             transform-origin: center center;
             user-select: none;
             -webkit-user-drag: none;
+            will-change: transform;
             transition: 0.5s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
         .container child-container.tracking {
@@ -70,6 +72,7 @@
             transform: translate(-50%, -50%);
             z-index: 1;
             border-radius: 15px;
+            will-change: transform;
         }
         #freeze-canvas {
             display: block;
@@ -82,6 +85,7 @@
             z-index: 2;
             opacity: 0;
             pointer-events: none;
+            will-change: transform;
         }
         #left-btn {
             position: absolute;
@@ -242,11 +246,11 @@
             align-items: center;
             opacity: 1;
             backface-visibility: visible;
+            /* will-change: transform; */
             transition-property: transform;
             transition-duration: 1.6667s;
             transition-timing-function: cubic-bezier(0.35, 0.00, 0.65, 1);
             transition-delay: 0ms;
-            /* transition: opacity 0.35s linear; */
         }
 
         /* .floor.is-hidden-3d {
@@ -1099,10 +1103,10 @@
             .main-container {
                 padding: 10px 5px;
                 flex-flow: column nowrap;
-                height: 160vh;
+                height: auto;
             }
             .container {
-                flex: 1 1 70vh;
+                flex: 1 1 55vh;
                 width: 100%;
             }
             
@@ -1113,9 +1117,9 @@
                 font-size: 10px;
             }
             #details-container {
-                flex: 1 1 85vh;
+                flex: 1 1 auto;
                 width: 100%;
-                /* overflow-y: unset; */
+                overflow: unset;
             }
             #filter-container {
                 font-size: 14px;
@@ -1626,6 +1630,7 @@
                 ]
             },
         ];
+        console.log('initialised');
         let maincontainer = document.querySelector('.main-container');
         let container = document.querySelector('.container');
         let img = document.querySelector('.child-container');
@@ -1677,6 +1682,7 @@
         };
 
         function applyFilters() {
+            console.log('filters applied');
             // 1. Resolve Range Slider values (handles inversion gracefully)
             const val1 = parseFloat(slider1.value);
             const val2 = parseFloat(slider2.value);
@@ -1925,6 +1931,8 @@
         const floorcontainer = document.querySelector('.floor-container');
         
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
+            console.log(newSrc, p, currentRotation)
+            console.log('playcanvas called');
             canvas.width = mainvideo.videoWidth;
             canvas.height = mainvideo.videoHeight;
             // below code freeze the last frame in canvas
@@ -1945,8 +1953,6 @@
                     floor.forEach(f => {
                         f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
                     });
-                    
-                    // Smoothly hide the canvas now that video is visible
                     canvas.style.opacity = 0;
                     });
                 }
@@ -1962,7 +1968,7 @@
                         setTimeout(() => {
                             canvas.style.opacity = 0;
                         }, 50)
-                })
+                    })
                 }
                 mainvideo.play().catch(err => {
                     console.error("Autoplay prevented or error:", err);
@@ -2038,6 +2044,7 @@
         mainvideo.currentTime = 0;
         createDetails();
         function createDetails() {
+            console.log('createDetails called');
             alldetails.forEach(function (ad) {
                 let singlefloor = document.createElement('details');
                 singlefloor.className = `singlefloor`;
@@ -2130,6 +2137,7 @@
         let sf = document.querySelector('.singlefloor');
         sf.open = true;
         bhk2.forEach(function(b2) {
+            console.log('b2 called');
             let outerAffects = `<div class="arc lefts inner"></div>
                                 <div class="arc lefts outer"></div>
                                 <div class="arc rights inner"></div>
@@ -2142,6 +2150,7 @@
             })
         })
         bhk3.forEach(function(b3) {
+            console.log('b3 called');
             let outerAffects = `<div class="arc lefts inner"></div>
                                 <div class="arc lefts outer"></div>
                                 <div class="arc rights inner"></div>
@@ -2243,6 +2252,7 @@
 
         let itelement, selecticon;
         function findDetails(iT) {
+            console.log('finddetails called')
             if (itelement != undefined) {
                 itelement.classList.remove('lactive');
             }
@@ -2283,6 +2293,7 @@
         let startScale = 1;
         let zoom = 3.0;
         function updateTransform(s) {
+            console.log('update transoform called')
             let containerRect = container.getBoundingClientRect();
             let imgWidth = img.offsetWidth;
             let imgHeight = img.offsetHeight;
@@ -2347,20 +2358,23 @@
             }
         });
 
-        window.addEventListener('mousemove', (e) => {
+        container.addEventListener('mousemove', (e) => {
             if (isDragging) {
                 posX = e.clientX - startX;
                 posY = e.clientY - startY;
                 updateTransform();
                 bhk2.forEach((b2) => {
+                    console.log('uT b2 called');
                     b2.style.pointerEvents = 'none';
                 })
                 bhk3.forEach((b3) => {
+                    console.log('uT b3 called');
                     b3.style.pointerEvents = 'none';
                 })
             }
             if (!isDragging) {
                 bhk2.forEach((b2) => {
+                    console.log('uT b2 1 called');
                     if (planecontainer.classList.contains('is-hidden-3d')) {
                         b2.style.pointerEvents = 'none';
                     }
@@ -2372,6 +2386,7 @@
                     }
                 })
                 bhk3.forEach((b3) => {
+                    console.log('uT b3 1 called');
                     if (planecontainer.classList.contains('is-hidden-3d')) {
                         b3.style.pointerEvents = 'none';
                     }
@@ -2385,16 +2400,19 @@
             }
         });
         // check it run all the time...
-        window.addEventListener('mouseup', () => {
+        container.addEventListener('mouseup', () => {
             isDragging = false;
             img.classList.remove('tracking');
             updateTransform();
+            if (planecontainer.classList.contains('is-hidden-3d')) return
             bhk2.forEach((b2) => {
+                console.log('uT b2 2 called');
                 if (b2.parentElement.classList.contains('is-hidden-3d')) return
                 if (b2.classList.contains('is-hidden-3d')) return
                 b2.style.pointerEvents = 'visible';
             })
             bhk3.forEach((b3) => {
+                console.log('uT b3 2 called');
                 if (b3.parentElement.classList.contains('is-hidden-3d')) return
                 if (b3.classList.contains('is-hidden-3d')) return
                 b3.style.pointerEvents = 'visible';
