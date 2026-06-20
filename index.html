@@ -2469,6 +2469,21 @@
             }
             updateTransform();
         });
+        async function initApp() {
+            for (const time of Object.keys(allvideo)) {
+            for (const dir of Object.keys(allvideo[time])) {
+                allvideo[time][dir] = await Promise.all(
+                    allvideo[time][dir].map(async (url) => {
+                        const response = await fetch(url);
+                        const blob = await response.blob();
+                        return URL.createObjectURL(blob); // Overwrites string with blob://
+                        })
+                    );
+                }
+            }
+            console.log("Preload complete. Blobs ready:", allvideo);
+            updateVideoSource();
+        };
         syncWidth();
         playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
         updateSliders();
