@@ -2484,7 +2484,8 @@
                 }
             }
             console.log("Preload complete. Blobs ready:", allvideo);
-            updateVideoSource();
+            // it will help to change current video is showing, but it not use now.
+            //updateVideoSource();
         };
         syncWidth();
         playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
