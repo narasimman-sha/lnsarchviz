@@ -2470,8 +2470,10 @@
             updateTransform();
         });
         async function initApp() {
+            console.log('initapp called');
             for (const time of Object.keys(allvideo)) {
             for (const dir of Object.keys(allvideo[time])) {
+                console.log(time, dir);
                 allvideo[time][dir] = await Promise.all(
                     allvideo[time][dir].map(async (url) => {
                         const response = await fetch(url);
