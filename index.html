@@ -1875,8 +1875,7 @@
         daytrigger.addEventListener('click', async () => {
             if(timing == 'day') return
             timing = 'day';
-            const activeVideo = await getOrFetchVideoBlob(timing, 'forward', currentstep);
-            playWithCanvasBuffer(activeVideo, 'pause');
+            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
             daytrigger.classList.add('tactive');
             nighttrigger.classList.remove('tactive');
             maincontainer.style.backgroundImage = 'url(images/BGDay.webp)';
@@ -1886,8 +1885,7 @@
         nighttrigger.addEventListener('click', async () => {
             if(timing == 'night') return
             timing = 'night';
-            const activeVideo = await getOrFetchVideoBlob(timing, 'forward', currentstep);
-            playWithCanvasBuffer(activeVideo, 'pause');
+            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
             daytrigger.classList.remove('tactive');
             nighttrigger.classList.add('tactive');
             maincontainer.style.backgroundImage = 'url(images/BGNight.webp)';
@@ -2005,8 +2003,7 @@
             setPlayingState(true);
             updateTransform(1);
             currentRotation += 90; // Rotate right
-            const activeVideo = await getOrFetchVideoBlob(timing, 'forward', currentstep);
-            playWithCanvasBuffer(activeVideo, 'play', currentRotation);
+            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'play', currentRotation);
             currentstep = (currentstep + 1) % totalsteps;
         }
         async function moveRight() {
@@ -2015,8 +2012,7 @@
             updateTransform(1);
             currentRotation -= 90; // Rotate left
             let prevstep = (currentstep - 1 + totalsteps) % totalsteps;
-            const activeVideo = await getOrFetchVideoBlob(timing, 'backward', prevstep);
-            playWithCanvasBuffer(activeVideo, 'play', currentRotation);
+            playWithCanvasBuffer(allvideo[timing].backward[prevstep], 'play', currentRotation);
             currentstep = prevstep;
         }
         function setPlayingState(state) {
@@ -2473,63 +2469,10 @@
             }
             updateTransform();
         });
-async function getOrFetchVideoBlob(time, direction, index) {
-    const target = allvideo[time][direction][index];
-    
-    if (target.startsWith('blob:')) {
-        return target;
-    }
-
-    // FIXED: Use navigator.serviceWorker.ready to guarantee the message is delivered
-    if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready;
-        const activeWorker = registration.active || navigator.serviceWorker.controller;
-        
-        if (activeWorker) {
-            console.log(`[Main] Sending prioritize signal to SW for: ${target}`);
-            activeWorker.postMessage({
-                type: 'PRIORITIZE_ASSET',
-                url: target
-            });
-        }
-    }
-
-    // Wait 100ms for the browser to forcefully terminate the canceled network pipeline connection
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    try {
-        console.log(`[Main] Fetching user-prioritized asset: ${target}`);
-        const response = await fetch(target);
-        const blob = await response.blob();
-        const blobURL = URL.createObjectURL(blob);
-        
-        allvideo[time][direction][index] = blobURL;
-        return blobURL;
-    } catch (error) {
-        console.error("Failed to load active video stream on-demand:", error);
-        return target;
-    }
-}
-        async function initApp() {
-            console.log("App initializing... preloading immediate starting frames.");
-            await getOrFetchVideoBlob('day', 'forward', 0);
-            await getOrFetchVideoBlob('day', 'backward', 3); // your r4.webm equivalent index
-        }
-
-        window.addEventListener('load', initApp);
         syncWidth();
         playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
         updateSliders();
         applyFilters();
-    </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker Active!', reg.scope))
-                .catch(err => console.error('Service Worker registration failed:', err));
-            });
-        }
     </script>
 </body>
 </html>
