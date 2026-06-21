@@ -1872,20 +1872,22 @@
         
         
         //console.log(bhk2, bhk3)
-        daytrigger.addEventListener('click', () => {
+        daytrigger.addEventListener('click', async () => {
             if(timing == 'day') return
             timing = 'day';
-            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
+            const activeVideo = await getOrFetchVideoBlob(timing, 'forward', currentstep);
+            playWithCanvasBuffer(activeVideo, 'pause');
             daytrigger.classList.add('tactive');
             nighttrigger.classList.remove('tactive');
             maincontainer.style.backgroundImage = 'url(images/BGDay.webp)';
             mapimage.style.backgroundImage = 'url(images/minimap.webp)';
             smallmap.classList.remove('night');
         })
-        nighttrigger.addEventListener('click', () => {
+        nighttrigger.addEventListener('click', async () => {
             if(timing == 'night') return
             timing = 'night';
-            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
+            const activeVideo = await getOrFetchVideoBlob(timing, 'forward', currentstep);
+            playWithCanvasBuffer(activeVideo, 'pause');
             daytrigger.classList.remove('tactive');
             nighttrigger.classList.add('tactive');
             maincontainer.style.backgroundImage = 'url(images/BGNight.webp)';
@@ -1998,21 +2000,23 @@
             
         }
         
-        function moveLeft() {
+        async function moveLeft() {
             if (isplaying) return;
             setPlayingState(true);
             updateTransform(1);
             currentRotation += 90; // Rotate right
-            playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'play', currentRotation);
+            const activeVideo = await getOrFetchVideoBlob(timing, 'forward', currentstep);
+            playWithCanvasBuffer(activeVideo, 'play', currentRotation);
             currentstep = (currentstep + 1) % totalsteps;
         }
-        function moveRight() {
+        async function moveRight() {
             if (isplaying) return;
             setPlayingState(true);
             updateTransform(1);
             currentRotation -= 90; // Rotate left
             let prevstep = (currentstep - 1 + totalsteps) % totalsteps;
-            playWithCanvasBuffer(allvideo[timing].backward[prevstep], 'play', currentRotation);
+            const activeVideo = await getOrFetchVideoBlob(timing, 'backward', prevstep);
+            playWithCanvasBuffer(activeVideo, 'play', currentRotation);
             currentstep = prevstep;
         }
         function setPlayingState(state) {
@@ -2469,29 +2473,47 @@
             }
             updateTransform();
         });
-        async function initApp() {
-            console.log('initapp called');
-            for (const time of Object.keys(allvideo)) {
-            for (const dir of Object.keys(allvideo[time])) {
-                console.log(time, dir);
-                allvideo[time][dir] = await Promise.all(
-                    allvideo[time][dir].map(async (url) => {
-                        const response = await fetch(url);
-                        const blob = await response.blob();
-                        return URL.createObjectURL(blob); // Overwrites string with blob://
-                        })
-                    );
-                }
+        async function getOrFetchVideoBlob(time, direction, index) {
+            const target = allvideo[time][direction][index];
+    
+            // If it's already converted to a blob url string (starts with blob:), return it
+            if (target.startsWith('blob:')) {
+                return target;
             }
-            console.log("Preload complete. Blobs ready:", allvideo);
-            // it will help to change current video is showing, but it not use now.
-            //updateVideoSource();
-        };
+
+            // Otherwise, signal the SW to back off its background downloads
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                type: 'PRIORITIZE_ASSET',
+                url: target
+            });
+        }
+
+        // Now cleanly download the priority target
+        try {
+            const response = await fetch(target);
+            const blob = await response.blob();
+            const blobURL = URL.createObjectURL(blob);
+        
+            // Save it back into the object so next access is instantaneous
+            allvideo[time][direction][index] = blobURL;
+            return blobURL;
+        } catch (error) {
+            console.error("Failed to load active video stream on-demand:", error);
+            return target; // Fallback to raw path string if request fails
+            }
+        }
+        async function initApp() {
+            console.log("App initializing... preloading immediate starting frames.");
+            await getOrFetchVideoBlob('day', 'forward', 0);
+            await getOrFetchVideoBlob('day', 'backward', 3); // your r4.webm equivalent index
+        }
+
+        window.addEventListener('load', initApp);
         syncWidth();
         playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
         updateSliders();
         applyFilters();
-        window.addEventListener('load', initApp);
     </script>
     <script>
         if ('serviceWorker' in navigator) {
