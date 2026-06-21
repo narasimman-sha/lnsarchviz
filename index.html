@@ -86,6 +86,7 @@
             z-index: 2;
             opacity: 0;
             pointer-events: none;
+            border-radius: 15px;
             will-change: transform;
         }
         #left-btn {
@@ -2473,86 +2474,6 @@
         playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
         updateSliders();
         applyFilters();
-const queue = [
-  ...allvideo.day.forward,
-  ...allvideo.day.backward,
-  ...allvideo.night.forward,
-  ...allvideo.night.backward
-];
-
-const CACHE_NAME = 'video-cache-v1';
-let isDownloading = false;
-let currentController = null;
-
-async function isCached(url) {
-  const cache = await caches.open(CACHE_NAME);
-  return !!(await cache.match(url));
-}
-
-async function downloadNext() {
-  if (isDownloading) return;
-  if (queue.length === 0) {
-    console.log('All done');
-    return;
-  }
-
-  const url = queue.shift();
-  if (await isCached(url)) {
-    console.log('Already cached', url);
-    return downloadNext();
-  }
-
-  isDownloading = true;
-  currentController = new AbortController();
-  const signal = currentController.signal;
-
-  try {
-    const res = await fetch(url, { signal, mode: 'cors' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const cache = await caches.open(CACHE_NAME);
-    await cache.put(url, res.clone());
-    console.log('Cached', url);
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      console.log('Aborted', url);
-      queue.unshift(url); // retry later
-    } else {
-      console.error('Failed', url, err);
-      // optionally retry logic here
-    }
-  } finally {
-    isDownloading = false;
-    currentController = null;
-    downloadNext();
-  }
-}
-
-function startDownloads() {
-  downloadNext();
-}
-
-async function prioritizeAndDownload(url) {
-  if (await isCached(url)) {
-    console.log('Already cached', url);
-    return;
-  }
-  const idx = queue.indexOf(url);
-  if (idx !== -1) queue.splice(idx, 1);
-  queue.unshift(url);
-  if (currentController) currentController.abort();
-  else downloadNext();
-}
-
-// Example: hook up UI elements with data-video-url attributes
-document.addEventListener('click', async (e) => {
-  const el = e.target.closest('[data-video-url]');
-  if (!el) return;
-  const url = el.getAttribute('data-video-url');
-  if (!url) return;
-  await prioritizeAndDownload(url);
-});
-
-startDownloads();
     </script>
 </body>
 </html>
