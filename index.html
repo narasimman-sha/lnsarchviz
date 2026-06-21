@@ -2473,37 +2473,43 @@
             }
             updateTransform();
         });
-        async function getOrFetchVideoBlob(time, direction, index) {
-            const target = allvideo[time][direction][index];
+async function getOrFetchVideoBlob(time, direction, index) {
+    const target = allvideo[time][direction][index];
     
-            if (target.startsWith('blob:')) {
-                return target;
-            }       
+    if (target.startsWith('blob:')) {
+        return target;
+    }
 
-            // Signal the SW to IMMEDIATELY cancel whatever it is currently doing
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'PRIORITIZE_ASSET',
-                    url: target
-                });
-            }
-
-            // Wait a tiny fraction of a second (50ms) for the browser to clear the canceled connection pipeline
-            await new Promise(resolve => setTimeout(resolve, 50));
-
-            try {
-                console.log(`[Main] Fetching user-prioritized asset: ${target}`);
-                const response = await fetch(target);
-                const blob = await response.blob();
-                const blobURL = URL.createObjectURL(blob);
+    // FIXED: Use navigator.serviceWorker.ready to guarantee the message is delivered
+    if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        const activeWorker = registration.active || navigator.serviceWorker.controller;
         
-                allvideo[time][direction][index] = blobURL;
-                return blobURL;
-            } catch (error) {
-                console.error("Failed to load active video stream on-demand:", error);
-                return target;
-            }
+        if (activeWorker) {
+            console.log(`[Main] Sending prioritize signal to SW for: ${target}`);
+            activeWorker.postMessage({
+                type: 'PRIORITIZE_ASSET',
+                url: target
+            });
         }
+    }
+
+    // Wait 100ms for the browser to forcefully terminate the canceled network pipeline connection
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    try {
+        console.log(`[Main] Fetching user-prioritized asset: ${target}`);
+        const response = await fetch(target);
+        const blob = await response.blob();
+        const blobURL = URL.createObjectURL(blob);
+        
+        allvideo[time][direction][index] = blobURL;
+        return blobURL;
+    } catch (error) {
+        console.error("Failed to load active video stream on-demand:", error);
+        return target;
+    }
+}
         async function initApp() {
             console.log("App initializing... preloading immediate starting frames.");
             await getOrFetchVideoBlob('day', 'forward', 0);

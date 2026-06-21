@@ -23,10 +23,10 @@ self.addEventListener('message', (event) => {
             currentAbortController = null;
         }
 
-        // Resume sequential background downloads automatically after 3 seconds
+        // Resume sequential background downloads automatically after 3.5 seconds
         setTimeout(() => {
             isPaused = false;
-        }, 3000);
+        }, 3500);
     }
 });
 
