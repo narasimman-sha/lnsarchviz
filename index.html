@@ -2476,31 +2476,32 @@
         async function getOrFetchVideoBlob(time, direction, index) {
             const target = allvideo[time][direction][index];
     
-            // If it's already converted to a blob url string (starts with blob:), return it
             if (target.startsWith('blob:')) {
                 return target;
-            }
+            }       
 
-            // Otherwise, signal the SW to back off its background downloads
+            // Signal the SW to IMMEDIATELY cancel whatever it is currently doing
             if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
                 navigator.serviceWorker.controller.postMessage({
-                type: 'PRIORITIZE_ASSET',
-                url: target
-            });
-        }
+                    type: 'PRIORITIZE_ASSET',
+                    url: target
+                });
+            }
 
-        // Now cleanly download the priority target
-        try {
-            const response = await fetch(target);
-            const blob = await response.blob();
-            const blobURL = URL.createObjectURL(blob);
+            // Wait a tiny fraction of a second (50ms) for the browser to clear the canceled connection pipeline
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            try {
+                console.log(`[Main] Fetching user-prioritized asset: ${target}`);
+                const response = await fetch(target);
+                const blob = await response.blob();
+                const blobURL = URL.createObjectURL(blob);
         
-            // Save it back into the object so next access is instantaneous
-            allvideo[time][direction][index] = blobURL;
-            return blobURL;
-        } catch (error) {
-            console.error("Failed to load active video stream on-demand:", error);
-            return target; // Fallback to raw path string if request fails
+                allvideo[time][direction][index] = blobURL;
+                return blobURL;
+            } catch (error) {
+                console.error("Failed to load active video stream on-demand:", error);
+                return target;
             }
         }
         async function initApp() {
