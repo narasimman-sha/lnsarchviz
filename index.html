@@ -1181,6 +1181,24 @@
                 flex: 1 1 60%;
                 width: auto;
             }
+            #timetrigger {
+                top: 10px;
+                width: 160px;
+            }
+            #daytrigger {
+                padding: 2px;
+            }
+            #nighttrigger {
+                padding: 2px 4px 2px 2px;
+                gap: 0px;
+            }
+            #planetrigger {
+                bottom: 10px;
+            }
+            #plane-btn {
+                font-size: 14px;
+                padding: 3px 6px;
+            }
             #details-container {
                 flex: 1 1 35%;
                 overflow-y: scroll;
@@ -1230,6 +1248,12 @@
                 font-size: 14px;
                 padding: 3px 6px;
             }
+            .ullist {
+                flex-flow: row wrap;
+            }
+            .lilist {
+                flex-basis: 45%;
+            }
         }
         @media screen and (max-width: 600px) and (max-height: 600px) {
             .main-container {
@@ -1242,13 +1266,6 @@
                 width: 100%;
             }
             
-            .ullist {
-                flex-flow: row wrap;
-            }
-            .lilist {
-                width: auto;
-                flex-basis: 45%;
-            }
         }
     </style>
 </head>
