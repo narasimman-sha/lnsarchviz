@@ -85,8 +85,8 @@
             object-fit: contain;
             z-index: 2;
             opacity: 0;
-            pointer-events: none;
             border-radius: 15px;
+            pointer-events: none;
             will-change: transform;
         }
         #left-btn {
@@ -736,7 +736,7 @@
             user-select: none;
             opacity: 1;
             margin-bottom: 5px;
-            max-height: 600px;
+            max-height: 1000px;
             transition: 0.5s ;
         }
         .singlefloor.is-hidden {
@@ -1156,17 +1156,6 @@
             #right-btn {
                 right: 5px;
             }
-        }
-        @media screen and (max-width: 700px) {
-            #timetrigger {
-                width: 170px;
-            }
-            #daytrigger {
-                padding: 4px;
-            }
-            #nighttrigger {
-                padding: 4px 8px 4px 4px;
-            }
             #smallmap {
                 border-radius: 15px;
                 padding: 3px;
@@ -1181,7 +1170,83 @@
             .modal {
                 padding: 10px;
             }
+        }
+        @media screen and (max-width: 1100px) and (max-height: 600px) {
+            .main-container {
+                padding: 10px 5px;
+                flex-flow: row nowrap;
+                height: 100vh;
+            }
+            .container {
+                flex: 1 1 60%;
+                width: auto;
+            }
+            #details-container {
+                flex: 1 1 35%;
+                overflow-y: scroll;
+            }
+            #filter-container {
+                flex-flow: column;
+            }
+            #selection-btn {
+                flex-flow: row wrap;
+            }
+            #selection-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+            .slider-container {
+                width: 100%;
+            }
+            .licontainer {
+                font-size: 12px;
+            }
+            .ullist {
+                flex-flow: column nowrap;
+            }
             .lilist {
+                width: 100%;
+            }
+            #filter-container {
+                font-size: 12px;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            #timetrigger {
+                top: 10px;
+                width: 160px;
+            }
+            #daytrigger {
+                padding: 2px;
+            }
+            #nighttrigger {
+                padding: 2px 4px 2px 2px;
+                gap: 0px;
+            }
+            #planetrigger {
+                bottom: 10px;
+            }
+            #plane-btn {
+                font-size: 14px;
+                padding: 3px 6px;
+            }
+        }
+        @media screen and (max-width: 600px) and (max-height: 600px) {
+            .main-container {
+                padding: 10px 5px;
+                flex-flow: column nowrap;
+                height: auto;
+            }
+            .container {
+                flex: 1 1 70vh;
+                width: 100%;
+            }
+            
+            .ullist {
+                flex-flow: row wrap;
+            }
+            .lilist {
+                width: auto;
                 flex-basis: 45%;
             }
         }
