@@ -504,19 +504,26 @@
         
         .compasscontainer {
             width: 100%;
+            height: 100%;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotateX(15deg);
         }
-        .compasscontainer img {
+        .compasscontainer div {
             width: 100%;
+            height: 100%;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
         }
+        
         #outer-compass {
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-image: url(images/outer_compass.webp);
             transition-property: transform;
             transition-duration: 1.6667s;
             transition-timing-function: cubic-bezier(0.35, 0.00, 0.65, 1);
@@ -526,6 +533,13 @@
         /* .compasscontainer:hover #outer-compass{
             transform: translate(-50%, -50%) rotateZ(90deg)
         } */
+        #inner-compass {
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-image: url(images/inner_compass.webp);
+            transition: background 0.75s;
+        }
         #smallmap {
             position: absolute;
             z-index: 3;
@@ -1527,8 +1541,8 @@
             </div>
             <div id="smallcompass">
                 <div class="compasscontainer">
-                    <img id="outer-compass" src="images/outer_compass.webp">
-                    <img id="inner-compass" src="images/inner_compass.webp">
+                    <div id="outer-compass"></div>
+                    <div id="inner-compass"></div>
                 </div>
             </div>
             <div id="smallmap">
@@ -1795,6 +1809,7 @@
         let planecontainer = document.querySelector('.plane-container');
         let planebtn = document.querySelector('#plane-btn');
         let outercompass = document.querySelector('#outer-compass');
+        let innercompass = document.querySelector('#inner-compass');
         let smallmap = document.querySelector('#smallmap');
         let mapimage = document.querySelector('.mapimage');
         let showcolors = document.querySelector('.showcolors');
@@ -2024,6 +2039,8 @@
             daytrigger.classList.add('tactive');
             nighttrigger.classList.remove('tactive');
             maincontainer.style.backgroundImage = 'url(images/BGDay.webp)';
+            outercompass.style.backgroundImage= 'url(images/outer_compass.webp)'
+            innercompass.style.backgroundImage = 'url(images/inner_compass.webp)';
             mapimage.style.backgroundImage = 'url(images/minimap.webp)';
             smallmap.classList.remove('night');
         })
@@ -2034,6 +2051,8 @@
             daytrigger.classList.remove('tactive');
             nighttrigger.classList.add('tactive');
             maincontainer.style.backgroundImage = 'url(images/BGNight.webp)';
+            outercompass.style.backgroundImage= 'url(images/outer_compass_white.webp)'
+            innercompass.style.backgroundImage = 'url(images/inner_compass_white.webp)';
             mapimage.style.backgroundImage = 'url(images/minimapn.webp)';
             smallmap.classList.add('night');
         })
@@ -2095,7 +2114,7 @@
                 mainvideo.requestVideoFrameCallback(() => {
                     // This runs EXACTLY when the first new frame renders!
                     console.log("First frame officially rendered:", mainvideo.currentTime);
-                    
+                    outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
                     floor.forEach(f => {
                         f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
                     });
@@ -2148,7 +2167,6 @@
             setPlayingState(true);
             updateTransform(1);
             currentRotation += 90; // Rotate right
-            outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
             playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'play', currentRotation);
             currentstep = (currentstep + 1) % totalsteps;
         }
@@ -2157,7 +2175,6 @@
             setPlayingState(true);
             updateTransform(1);
             currentRotation -= 90; // Rotate left
-            outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
             let prevstep = (currentstep - 1 + totalsteps) % totalsteps;
             playWithCanvasBuffer(allvideo[timing].backward[prevstep], 'play', currentRotation);
             currentstep = prevstep;
