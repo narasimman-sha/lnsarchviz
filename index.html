@@ -301,7 +301,7 @@
             gap: 5%;
             backface-visibility: hidden;
             opacity: 1;
-            pointer-events: auto;
+            pointer-events: visible;
             transition: opacity 0.35s ease-in-out;
         }
         .left, .right {
@@ -315,7 +315,7 @@
             gap: 5%;
             backface-visibility: hidden;
             opacity: 1;
-            pointer-events: auto;
+            pointer-events: visible;
             transition: opacity 0.35s ease-in-out;
         }
 
@@ -330,7 +330,7 @@
         .front > div, .left > div, .back > div, .right > div {
             opacity: 1;
             transform: scale(1);
-            pointer-events: auto;
+            pointer-events: visible;
             /* Transition opacity and transform concurrently for 3D realism */
             transition: opacity 0.4s ease, transform 0.4s ease-out;
         }
@@ -2550,6 +2550,15 @@
                     else if (b2.classList.contains('is-hidden-3d')) {
                         b2.style.pointerEvents = 'none';
                     }
+                    else if (!planecontainer.classList.contains('is-hidden-3d')) {
+                        b2.style.pointerEvents = 'visible';
+                    }
+                    else if (!b2.parentElement.classList.contains('is-hidden-3d')) {
+                        b2.style.pointerEvents = 'visible';
+                    }
+                    else if (!b2.classList.contains('is-hidden-3d')) {
+                        b2.style.pointerEvents = 'visible';
+                    }
                 })
                 bhk3.forEach((b3) => {
                     console.log('uT b3 1 called');
@@ -2561,6 +2570,15 @@
                     }
                     else if (b3.classList.contains('is-hidden-3d')) {
                         b3.style.pointerEvents = 'none';
+                    }
+                    else if (!planecontainer.classList.contains('is-hidden-3d')) {
+                        b3.style.pointerEvents = 'visible';
+                    }
+                    else if (!b3.parentElement.classList.contains('is-hidden-3d')) {
+                        b3.style.pointerEvents = 'visible';
+                    }
+                    else if (!b3.classList.contains('is-hidden-3d')) {
+                        b3.style.pointerEvents = 'visible';
                     }
                 })
             }
