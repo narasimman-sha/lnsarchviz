@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+    <script defer
+      src="https://cdn.jsdelivr.net/npm/aframe-orbit-controls@1.3.2/dist/aframe-orbit-controls.min.js">
+    </script>
+    <title>Interior</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            box-sizing: content-box;   
+        }
+        #tour-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            padding: 0;
+            margin: 0;
+            box-sizing: content-box;
+        }
+        .ui-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            padding: 0;
+            margin: 0;
+            box-sizing: content-box;
+        }
+        .ui-container * {
+            pointer-events: all;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: "Roboto", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
+        .ui-container img {
+            display: block;
+            width: 100%;
+        }
+        .ui-container button {
+            display: block;
+            width: 100%;
+        }
+        #timetrigger {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            width: 200px;
+            transform: translate(-50%, 0%);
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        #timetrigger svg {
+            fill: white;
+            height: 20px;
+            transition: 0.35s;
+        }
+        #daytrigger {
+            flex: 1 1 45%;
+            color: white;
+            background: transparent;
+            border: 0;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            font-size: 1.1rem;
+            padding: 8px;
+            font-weight: 600;
+        }
+        
+        #daytrigger:hover {
+            background-color: #dddddd5a;
+            color: #353535;
+        }
+        
+        #nighttrigger {
+            flex: 1 1 50%;
+            color: white;
+            background: transparent;
+            border: 0;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            font-size: 1.1rem;
+            padding: 8px 12px 8px 8px; 
+            font-weight: 600;
+        }
+        #nighttrigger:hover {
+            background-color: #dddddd5a;
+            color: #353535;
+        }
+        .tactive {
+            color: #1c1c1c !important;
+            background-color: #edf1f4 !important;
+            
+        }
+        .tactive svg {
+            fill: #1c1c1c !important;
+        }
+        #option-ui {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            display: flex;
+            flex-flow: column wrap;
+            gap: 6px;
+        }
+        .full-screen {
+            cursor: pointer;
+            transition: 0.35s;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        .full-screen:hover .fs-enter svg {
+            transform: scale(1.1);
+            fill: #525252;
+        }
+        .full-screen:hover .fs-exit svg {
+            transform: scale(0.85);
+            fill: #525252;
+        }
+        .fs-enter svg {
+            transition: 0.35s;
+        }
+        .fs-exit svg {
+            transition: 0.35s;
+        }
+        .full-screen .fs-exit {
+            display: none;
+        }
+        .full-screen.is-fullscreen .fs-enter {
+            display: none;
+        }
+        .full-screen.is-fullscreen .fs-exit {
+            display: block;
+        }
+        .share-content {
+            cursor: pointer;
+            transition: 0.35s;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        .share-content svg {
+            transition: 0.35s;
+        }
+        .share-content:hover .sharing svg {
+            fill: #525252;
+            transform: scale(1.1);
+        }
+        #changable-ui {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            width: 95%;
+            max-width: 600px;
+            transform: translate(-50%, 0%);
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .floor-plan {
+            width: 70px;
+            height: 40px;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            font-size: 1.1rem;
+            padding: 10px 8px 8px 8px;
+            font-weight: 600;
+            box-shadow: 3px 3px 6px rgba(88, 88, 88, 0.5);
+        }
+        .plan {
+            justify-self: center;
+            align-self: center;
+            text-align: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            width: 100%;
+            height: 100%;
+        }
+        .posistion {
+            display: none;
+            top: 0px;
+            left: 0px;
+            position: absolute;
+        }
+        .sideselect {
+            width: 95px;
+            height: 40px;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            font-size: 1.1rem;
+            padding: 8px;
+            font-weight: 600;
+            box-shadow: 3px 3px 6px rgba(88, 88, 88, 0.5);
+        }
+        .side, .side::picker(select) {
+            appearance: base-select;
+        }
+        .side {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            gap: 1px;
+            background: transparent;
+            outline: none;
+            border: 0px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            width: 100%;
+            height: 100%;
+            padding-left: 4px;
+            justify-self: center;
+            align-self: center;
+            text-align: center;
+            align-items: center;
+            transition: 0.35s;
+        }
+        .side::picker-icon {
+            margin: 0;
+            content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -1060 960 960" width="22px" fill="%231f1f1f"><path d="m300-300 280-80 80-280-280 80-80 280Zm180-120q-25 0-42.5-17.5T420-480q0-25 17.5-42.5T480-540q25 0 42.5 17.5T540-480q0 25-17.5 42.5T480-420Zm0 340q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Zm0-320Z"/></svg>');
+            transition: 0.35s;
+        }
+        .side:open::picker-icon {
+            transform: rotate(180deg);
+            
+        }
+        .side:open {
+            /* background-color: #edf1f4;
+            transition: 0.35s; */
+        }
+
+        .side::picker(select) {
+            margin-left: -12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 20px;
+            outline: none;
+            border: 2px solid rgba(0, 0, 0, 0.50);
+            padding: 8px;
+            overflow: hidden;
+            transition: opacity 0.3s ease,
+                        transform 0.3s ease,
+                        display 0.3s allow-discrete,
+                        overlay 0.3s allow-discrete;
+        }
+        .side:open::picker(select) {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .side:not(:open)::picker(select) {
+            opacity: 0;
+            transform: translateY(25px) scale(0.95);
+        }
+        @starting-style {
+            .side:open::picker(select) {
+                opacity: 0;
+                transform: translateY(25px) scale(0.95);
+            }
+        }
+        .side option {
+            width: 80px;
+            border-radius: 10px;
+            transition: 0.35s;
+            gap: 3px;
+            transition: 0.35s;
+        }
+        
+        .side option:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+        .side option:checked {
+            background-color: rgba(255, 255, 255, 0.75);
+        }
+        .side option::checkmark {
+            content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -1060 860 960" width="24px" fill="%233d3d3d"><path d="M621.5-338.5Q680-397 680-480t-58.5-141.5Q563-680 480-680t-141.5 58.5Q280-563 280-480t58.5 141.5Q397-280 480-280t141.5-58.5ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Z"/></svg>');
+        }
+        
+        .floorselect {
+            /* width: 100px; */
+            height: 40px;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            font-size: 1.1rem;
+            padding: 8px 4px 8px 8px;
+            font-weight: 600;
+            box-shadow: 3px 3px 6px rgba(88, 88, 88, 0.5);
+        }
+        /* .floorselect > div:nth-child(1) {
+            font-size: 20px;
+            color: rgb(49, 49, 49);
+            font-weight: 600;
+        } */
+        .levelselection, .levelselection::picker(select) {
+            appearance: base-select;
+        }
+        .levelselection {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            gap: 1px;
+            background: transparent;
+            outline: none;
+            border: 0px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            width: 100%;
+            height: 100%;
+            padding-left: 4px;
+            justify-self: center;
+            align-self: center;
+            text-align: center;
+            align-items: center;
+            transition: 0.35s;
+        }
+        .levelselection::picker-icon {
+            margin: 0px;
+            content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -1060 960 960" width="24px" fill="%231f1f1f"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/></svg>');
+            transition: 0.35s;
+        }
+        .levelselection:open::picker-icon {
+            transform: rotate(180deg);
+        }
+        /* .levelselection:open {
+            background-color: #edf1f4;
+            transition: 0.35s;
+        } */
+        .levelselection::picker(select) {
+            margin-left: -12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 20px;
+            outline: none;
+            border: 2px solid rgba(0, 0, 0, 0.50);
+            padding: 8px;
+            overflow: hidden;
+            transition: opacity 0.3s ease,
+                        transform 0.3s ease,
+                        display 0.3s allow-discrete,
+                        overlay 0.3s allow-discrete;
+        }
+        .levelselection:open::picker(select) {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .levelselection:not(:open)::picker(select) {
+            opacity: 0;
+            transform: translateY(25px) scale(0.95);
+        }
+        @starting-style {
+            .levelselection:open::picker(select) {
+                opacity: 0;
+                transform: translateY(25px) scale(0.95);
+            }
+        }
+        .levelselection option {
+            border-radius: 10px;
+            transition: 0.35s;
+            gap: 3px;
+            transition: 0.35s;
+        }
+        
+        .levelselection option:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+        .levelselection option:checked {
+            background-color: rgba(255, 255, 255, 0.75);
+        }
+        .levelselection option::checkmark {
+            content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -1060 860 960" width="24px" fill="%233d3d3d"><path d="M621.5-338.5Q680-397 680-480t-58.5-141.5Q563-680 480-680t-141.5 58.5Q280-563 280-480t58.5 141.5Q397-280 480-280t141.5-58.5ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Z"/></svg>');
+        }
+        .booknow {
+            width: 70px;
+            height: 40px;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            background: rgba(231, 29, 29, 0.75);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            font-size: 1.1rem;
+            padding: 10px 8px 8px 8px;
+            font-weight: 600;
+            box-shadow: 3px 3px 4px rgba(168, 60, 60, 0.5);
+            transition: 0.35s;
+        }
+        .booknow:hover {
+            transform: scale(1.1);
+            box-shadow: 4px 4px 8px rgba(168, 60, 60, 0.35);
+        }
+        .book {
+            color: white;
+            justify-self: center;
+            align-self: center;
+            text-align: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #floating-ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        /* .present {
+            transform: scale(0.5);
+            opacity: 1;
+            transition: 0.35s;
+        } */
+        #floating-ui.present {
+            transform: scale(1);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            visibility: visible;
+            opacity: 1;
+            cursor: default;
+        }
+        .float-content {
+            padding: 1px;
+            width: min(85vw, 85vh);
+            width: min(85dvw, 85dvh);
+            aspect-ratio: 1 / 1;
+            background-color: white;
+            border-radius: 25px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            transition: 0.5s;
+        }
+        .float-content.contentpresent {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .plan-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .plan-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+        }
+        .plan-img img {
+            border-radius: 25px;
+        }
+        .plan-details {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+        .plan-title {
+            position: absolute;
+            left: 2%;
+            top: 2.5%;
+            padding: 0px 8px;
+            margin-left: 5px;
+            border-left: 7px solid rgb(103, 54, 54);
+            /* background-color: rgb(107, 101, 101);
+            border-radius: 25px;
+            box-shadow: 3px 3px 6px #7467675a; */
+            cursor: pointer;
+        }
+        .plan-title div {
+            color: rgb(93, 92, 92);
+            font-size: 2.5rem;
+
+        }
+        .plan-hotpoints > div {
+            width: 7%;
+            height: 7%;
+        }
+        .plan-hotpoints svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+            transition: 0.35s;
+            cursor: pointer;
+        }
+        .plan-hotpoints svg:hover {
+            transform: scale(1.35);
+        }
+        .phactive svg {
+            fill: rgb(154, 83, 83);
+            transform: scale(1.3);
+        }
+        /* .phactive::before {
+            width: 250%;
+            height: 45%;
+            content: "Currently Here";
+            color: white;
+            background-color: rgba(107, 158, 122, 0.468);
+            display: inline-block; 
+            align-items: center;
+            font-size: clamp(0.5rem, 1.5vw, 1rem);
+            padding: 4px;
+            border-radius: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            vertical-align: middle;
+            text-align: center;
+        } */
+        #plr1 {
+            position: absolute;
+            right: 35%;
+            top: 43%;
+        }
+        #plr2 {
+            position: absolute;
+            left: 25%;
+            top: 43%;
+        }
+        #pbr1 {
+            position: absolute;
+            left: 40%;
+            bottom: 17%;
+        }
+        #pbr2 {
+            position: absolute;
+            left: 33%;
+            top: 15%;
+        }
+        #pbr3 {
+            position: absolute;
+            right: 38%;
+            top: 15%;
+        }
+        #pbth1 {
+            position: absolute;
+            right: 36%;
+            bottom: 10%;
+        }
+        #pbth2 {
+            position: absolute;
+            left: 15%;
+            top: 19.5%;
+        }
+        #pbth3 {
+            position: absolute;
+            left: 15%;
+            top: 32%;
+        }
+        #pbalcony {
+            position: absolute;
+            left: 14%;
+            bottom: 30%;
+        }
+        #pstoreroom {
+            position: absolute;
+            right: 36%;
+            bottom: 22.5%;
+        }
+        #pkitchen {
+            position: absolute;
+            right: 20%;
+            bottom: 35%;
+        }
+        .close-btn {
+            right: 2%;
+            top: 2%;
+            position: absolute;
+            cursor: pointer;
+            background-color: rgb(154, 83, 83);
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: 3px 3px 6px rgba(154, 83, 83, 0.5);
+            transition: 0.35s;
+        }
+        .close-btn:hover {
+            transform: scale(1.1);
+            background-color: rgb(154, 83, 83);
+            box-shadow: 4px 4px 8px rgba(154, 83, 83, 0.5);
+        }
+        .close-btn:hover svg {
+            transform: scale(1.4);
+            fill: #cdcdcd;
+        }
+        .close-btn svg {
+            height: 22px;
+            transition: 0.35s;
+            fill: white;
+        }
+
+        #ascene-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+        .a-enter-vr {
+            display: none !important;
+        }
+        .a-enter-ar {
+            display: none !important;
+        }
+        .a-orientation-model {
+            display: none !important;
+        }
+        .a-canvas {
+            transition: filter 0.3s ease-in-out;
+        }
+        .scene-blur {
+            filter: blur(8px);
+        }
+        
+        @media screen and (max-width: 900px) {
+            #timetrigger {
+                top: 10px;
+                width: 160px;
+            }
+            #daytrigger {
+                padding: 2px;
+            }
+            #nighttrigger {
+                padding: 2px 4px 2px 2px;
+                gap: 0px;
+            }
+            .plan-title {
+                padding: 5px;
+                border-left: 4px solid rgb(103, 54, 54);
+            }
+            .plan-title div {
+                font-size: 1.25rem;
+            }
+        }
+        @media screen and (max-width: 900px) and (max-height: 600px) {
+            .floor-plan {
+                height: 30px;
+                padding: 4px;
+            }
+            .sideselect {
+                height: 30px;
+                padding: 4px; 
+            }
+            .floorselect {
+                height: 30px;
+                padding: 4px; 
+            }
+            .booknow {
+                height: 30px;
+                padding: 4px; 
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="tour-container">
+    <div class="ui-container">
+        <div id="timetrigger">
+            <button id="daytrigger" class="tactive">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M440-760v-160h80v160h-80Zm266 110-55-55 112-115 56 57-113 113Zm54 210v-80h160v80H760ZM440-40v-160h80v160h-80ZM254-652 140-763l57-56 113 113-56 54Zm508 512L651-255l54-54 114 110-57 59ZM40-440v-80h160v80H40Zm157 300-56-57 112-112 29 27 29 28-114 114Zm113-170q-70-70-70-170t70-170q70-70 170-70t170 70q70 70 70 170t-70 170q-70 70-170 70t-170-70Zm283-57q47-47 47-113t-47-113q-47-47-113-47t-113 47q-47 47-47 113t47 113q47 47 113 47t113-47ZM480-480Z"/></svg>
+            Day</button>
+            <button id="nighttrigger">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M484-80q-84 0-157.5-32t-128-86.5Q144-253 112-326.5T80-484q0-146 93-257.5T410-880q-18 99 11 193.5T521-521q71 71 165.5 100T880-410q-26 144-138 237T484-80Zm0-80q88 0 163-44t118-121q-86-8-163-43.5T464-465q-61-61-97-138t-43-163q-77 43-120.5 118.5T160-484q0 135 94.5 229.5T484-160Zm-20-305Z"/></svg>
+            Night</button>
+        </div>
+        <div id="option-ui">
+            <div class="full-screen">
+                <div class="fs-enter">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -1020 960 960" width="30px" fill="#1f1f1f"><path d="M120-120v-200h80v120h120v80H120Zm520 0v-80h120v-120h80v200H640ZM120-640v-200h200v80H200v120h-80Zm640 0v-120H640v-80h200v200h-80Z"/></svg>
+                </div>
+                <div class="fs-exit">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -1020 960 960" width="30px" fill="#1f1f1f"><path d="M240-120v-120H120v-80h200v200h-80Zm400 0v-200h200v80H720v120h-80ZM120-640v-80h120v-120h80v200H120Zm520 0v-200h80v120h120v80H640Z"/></svg>
+                </div>
+            </div>
+            <div class="share-content">
+                <div class="sharing">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -1020 960 960" width="30px" fill="#1f1f1f"><path d="M680-80q-50 0-85-35t-35-85q0-6 3-28L282-392q-16 15-37 23.5t-45 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q24 0 45 8.5t37 23.5l281-164q-2-7-2.5-13.5T560-760q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-24 0-45-8.5T598-672L317-508q2 7 2.5 13.5t.5 14.5q0 8-.5 14.5T317-452l281 164q16-15 37-23.5t45-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-80q17 0 28.5-11.5T720-200q0-17-11.5-28.5T680-240q-17 0-28.5 11.5T640-200q0 17 11.5 28.5T680-160ZM200-440q17 0 28.5-11.5T240-480q0-17-11.5-28.5T200-520q-17 0-28.5 11.5T160-480q0 17 11.5 28.5T200-440Zm508.5-291.5Q720-743 720-760t-11.5-28.5Q697-800 680-800t-28.5 11.5Q640-777 640-760t11.5 28.5Q663-720 680-720t28.5-11.5ZM680-200ZM200-480Zm480-280Z"/></svg>
+                </div>
+            </div>
+        </div>
+        <div id="changable-ui">
+            <div class="floor-plan">
+                <div class="plan">Plan</div>
+            </div>
+            <select class="posistion">
+                <option value="LR1A5K" selected>LR1</option>
+                <option value="LR2A5K">LR2</option>
+                <option value="BR1A5K">BR1</option>
+                <option value="BR2A5K">BR2</option>
+                <option value="BR3A5K">BR3</option>
+                <option value="BALCONYA5K">BALCONY</option>
+                <option value="KITCHENA5K">KITCHEN</option>
+                <option value="STOREROOM5K">STOREROOM</option>
+                <option value="BTH1A5K">BTH1</option>
+                <option value="BTH2A5K">BTH2</option>
+                <option value="BTH3A5K">BTH3</option>
+            </select>
+            <div class="sideselect">
+                <!-- <label>Facing</label> -->
+                <select class="side" id="flatfacing">
+                    <option value="0">South</option>
+                    <option value="90">East</option>
+                    <option value="180">North</option>
+                    <option value="270">West</option>
+                </select>
+            </div>
+            
+            <div class="floorselect">
+                <!-- <div>Floor:&nbsp;</div> -->
+                <select class="levelselection">
+                    <option value="1">Floor 1</option>
+                    <option value="2">Floor 2</option>
+                    <option value="3">Floor 3</option>
+                    <option value="4">Floor 4</option>
+                    <option value="5">Floor 5</option>
+                    <option value="6">Floor 6</option>
+                    <option value="7">Floor 7</option>
+                    <option value="8">Floor 8</option>
+                    <option value="9">Floor 9</option>
+                    <option value="10">Floor 10</option>
+                </select>
+            </div>
+            <div class="booknow">
+                <div class="book">
+                    Book
+                </div>
+            </div>
+        </div>
+        <div id="floating-ui" class=""><!--  no present here -->
+            <div class="float-content">
+                <div class="plan-content">
+                    <div class="plan-img">
+                        <img id="plan-image" src="">
+                    </div>
+                    <div class="plan-details">
+                        <div class="plan-title">
+                            <div>Plan</div>
+                        </div>
+                        <div class="plan-hotpoints">
+                            <div id="plr1" data-plocate="LR1A5K" title="Living Room"></div>
+
+                            <div id="plr2" data-plocate="LR2A5K" title="Living Room"></div>
+
+                            <div id="pbr1" data-plocate="BR1A5K" title="Bed Room 1"></div>
+
+                            <div id="pbr2" data-plocate="BR2A5K" title="Bed Room 2"></div>
+
+                            <div id="pbr3" data-plocate="BR3A5K" title="Bed Room 3"></div>
+
+                            <div id="pbth1" data-plocate="BTH1A5K" title="Bath Room 1"></div>
+
+                            <div id="pbth2" data-plocate="BTH2A5K" title="Bath Room 2"></div>
+
+                            <div id="pbth3" data-plocate="BTH3A5K" title="Bath Room 3"></div>
+
+                            <div id="pbalcony" data-plocate="BALCONYA5K" title="Balcony"></div>
+
+                            <div id="pstoreroom" data-plocate="STOREROOM5K" title="StoreRoom"></div>
+
+                            <div id="pkitchen" data-plocate="KITCHENA5K" title="Kitchen"></div>
+                        </div>
+                        <div class="close-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -1020 960 960" width="24px" fill="#1f1f1f"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="book-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <a-scene embedded vr-mode-ui="enabled: false" id="ascene-container">
+        <a-entity
+            camera="fov: 60; zoom: 1"
+            look-controls="enabled: false"
+            smooth-fov-zoom="minFov: 25; maxFov: 82.5; zoomSpeed: 3;"
+            orbit-controls="target: 0 0 0; minDistance: 0.05; maxDistance: 20; initialPosition: 8 0 0; enableDamping: true; rotateSpeed: -0.175; maxPolarAngle: 180; panSpeed: -0.175; enableZoom: false">
+        </a-entity>
+        <a-entity 
+            class="outerdome"
+            crossorigin="anonymous" 
+            geometry="primitive: sphere; segmentsWidth: 64; segmentsHeight: 64; radius: 300" 
+            material="minFilter: linear; magFilter: linear; side: back; shader: flat; opacity: 1;"
+            rotation ="0 0 0"
+            scale="-1 1 1"
+            animation="property: rotation; dur: 500; easing: easeInOutQuad; startEvents: rotatestart">
+        </a-entity>
+        <a-entity 
+            class="innerdome"
+            crossorigin="anonymous" 
+            geometry="primitive: sphere; segmentsWidth: 64; segmentsHeight: 64; radius: 100" 
+            material="minFilter: linear; magFilter: linear; side: back; shader: flat; transparent: true; alphaTest: 0.1; opacity: 1;"
+
+            scale="-1 1 1"
+            animation__fadein="property: material.opacity; from: 0; to: 1; dur: 500; easing: easeInOutQuad; startEvents: fadeIn"
+            animation__fadeout="property: material.opacity; from: 1; to: 0; dur: 500; easing: easeInOutQuad; startEvents: fadeOut">
+            
+        </a-entity>
+
+        <a-entity class="hotpoint LR1A5K" visible="true" scale="1 1 1">
+            <a-entity class="view lr2go" data-locate="LR2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-90 -8 0"
+            rotation="0 90 0"
+            scale="1.1 1.1 1.1"
+            data-scale="1.1 1.1 1.1"
+            animation__hoverin="property: scale; to: 1.3 1.3 1.3; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.1 1.1 1.1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/location.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="12.5 0 0">
+                
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Living Room;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view kitchengo" data-locate="KITCHENA5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="45 -7 40"
+            rotation="0 -140 0" 
+            scale="0.9 0.9 0.9"
+            data-scale="0.9 0.9 0.9"
+            animation__hoverin="property: scale; to: 1.1 1.1 1.1; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 0.9 0.9 0.9; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/kitchen.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="12.5 0 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Kitchen;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view br3go" data-locate="BR3A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-51.5 -7 -70"
+            rotation="0 0 0" 
+            scale="1.2 1.2 1.2"
+            data-scale="1.2 1.2 1.2"
+            animation__hoverin="property: scale; to: 1.4 1.4 1.4; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.2 1.2 1.2; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/door_open.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bedroom 3;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view br2go" data-locate="BR2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-65 -6 -57"
+            rotation="0 0 0" 
+            scale="1 1 1"
+            data-scale="1 1 1"
+            animation__hoverin="property: scale; to: 1.2 1.2 1.2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/door_open.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bedroom 2;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view br1go" data-locate="BR1A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-80 -4 42"
+            rotation="0 180 0" 
+            scale="1.1 1.1 1.1"
+            data-scale="1.1 1.1 1.1"
+            animation__hoverin="property: scale; to: 1.3 1.3 1.3; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.1 1.1 1.1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/door_open.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bedroom 1;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint LR2A5K" visible="false" scale="0 0 0">
+            <a-entity class="view lr1go" data-locate="LR1A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="80 -7 -8"
+            rotation="0 -90 0"
+            scale="1 1 1"
+            data-scale="1 1 1"
+            animation__hoverin="property: scale; to: 1.2 1.2 1.2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/location.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="12.5 0 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Living Room;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view kitchengo" data-locate="KITCHENA5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="95 -7 13"
+            rotation="0 -90 0" 
+            scale="1 1 1"
+            data-scale="1 1 1"
+            animation__hoverin="property: scale; to: 1.2 1.2 1.2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/kitchen.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="-12.5 0 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Kitchen;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view br3go" data-locate="BR3A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="66 -6 -60"
+            rotation="0 0 0" 
+            scale="1.1 1.1 1.1"
+            data-scale="1.1 1.1 1.1"
+            animation__hoverin="property: scale; to: 1.3 1.3 1.3; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.1 1.1 1.1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/door_open.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bedroom 3;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view br2go" data-locate="BR2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="47 -6 -70"
+            rotation="0 0 0" 
+            scale="1 1 1"
+            data-scale="1 1 1"
+            animation__hoverin="property: scale; to: 1.2 1.2 1.2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/door_open.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bedroom 2;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view br1go" data-locate="BR1A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-10 -7 70"
+            rotation="0 180 0" 
+            scale="1.1 1.1 1.1"
+            data-scale="1.1 1.1 1.1"
+            animation__hoverin="property: scale; to: 1.3 1.3 1.3; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.1 1.1 1.1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/door_open.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bedroom 1;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view balconygo" data-locate="BALCONYA5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.2; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-80 -7 85"
+            rotation="0 90 0" 
+            scale="1.8 1.8 1.8"
+            data-scale="1.8 1.8 1.8"
+            animation__hoverin="property: scale; to: 2 2 2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.8 1.8 1.8; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.75; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/360.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="12.5 0 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Balcony;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view bth3go" data-locate="BTH3A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: rgb(190, 190, 190); opacity: 0.2; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-71.5 -7 -50"
+            rotation="0 0 0" 
+            scale="1.35 1.35 1.35"
+            data-scale="1.35 1.35 1.35"
+            animation__hoverin="property: scale; to: 1.55 1.55 1.55; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.35 1.35 1.35; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.75; blending: normal; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/shower.png"
+                position="0 0 0.1"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: normal; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bathroom 3;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint BR1A5K" visible="false" scale="0 0 0">
+            <a-entity class="view lr2go" data-locate="LR2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-65 -7 -55"
+            rotation="0 0 0"
+            scale="1.25 1.25 1.25"
+            data-scale="1.25 1.25 1.25"
+            animation__hoverin="property: scale; to: 1.5 1.5 1.5; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.25 1.25 1.25; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/location.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Living Room;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view bth1go" data-locate="BTH1A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: white; opacity: 0.2; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="85 -9 27"
+            rotation="0 -90 0" 
+            scale="1.5 1.5 1.5"
+            data-scale="1.5 1.5 1.5"
+            animation__hoverin="property: scale; to: 1.7 1.7 1.7; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.5 1.5 1.5; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/shower.png"
+                position="0 0 0.1"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bathroom 1;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint BR2A5K" visible="false" scale="0 0 0">
+            <a-entity class="view lr1go" data-locate="LR1A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="47 -7 78"
+            rotation="0 180 0"
+            scale="1.3 1.3 1.3"
+            data-scale="1.3 1.3 1.3"
+            animation__hoverin="property: scale; to: 1.5 1.5 1.5; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.3 1.3 1.3; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/location.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Living Room; ">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view bth2go" data-locate="BTH2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: white; opacity: 0.2; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-70 -9 52"
+            rotation="0 90 0" 
+            scale="1.5 1.5 1.5"
+            data-scale="1.5 1.5 1.5"
+            animation__hoverin="property: scale; to: 1.7 1.7 1.7; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.5 1.5 1.5; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/shower.png"
+                position="0 0 0.1"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bathroom 2;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint BR3A5K" visible="false" scale="0 0 0">
+            <a-entity class="view lr2go" data-locate="LR2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-40 -7 78"
+            rotation="0 180 0"
+            scale="1.3 1.3 1.3"
+            data-scale="1.3 1.3 1.3"
+            animation__hoverin="property: scale; to: 1.5 1.5 1.5; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.3 1.3 1.3; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/location.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Living Room;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint KITCHENA5K" visible="false" scale="0 0 0">
+            <a-entity class="view lr1go" data-locate="LR1A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-55 -8 -42"
+            rotation="0 90 0"
+            scale="1.1 1.1 1.1"
+            data-scale="1.1 1.1 1.1"
+            animation__hoverin="property: scale; to: 1.3 1.3 1.3; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.1 1.1 1.1; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/location.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="12.5 0 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Living Room;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+            <a-entity class="view storeroomgo" data-locate="STOREROOM5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: rgb(190, 190, 190); opacity: 0.2; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-49.5 -9 69"
+            rotation="0 90 0" 
+            scale="1.5 1.5 1.5"
+            data-scale="1.5 1.5 1.5"
+            animation__hoverin="property: scale; to: 1.7 1.7 1.7; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.5 1.5 1.5; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: normal; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/dishwasher.png"
+                position="0 0 0.1"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: normal; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Store Room;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint BALCONYA5K" visible="false" scale="0 0 0">
+            <a-entity class="view lr2go" data-locate="LR2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="38 -7 -74"
+            rotation="0 -90 0"
+            scale="1.3 1.3 1.3"
+            data-scale="1.3 1.3 1.3"
+            animation__hoverin="property: scale; to: 1.5 1.5 1.5; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 1.3 1.3 1.3; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/location.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Living Room;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint STOREROOM5K" visible="false" scale="0 0 0">
+            <a-entity class="view kitchengo" data-locate="KITCHENA5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: rgb(190, 190, 190); opacity: 0.25; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="85 -7 -16.5"
+            rotation="0 -90 0"
+            scale="2 2 2"
+            data-scale="2 2 2"
+            animation__hoverin="property: scale; to: 2.2 2.2 2.2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 2 2 2; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: normal; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/kitchen.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: normal; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Kitchen;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint BTH1A5K" visible="false" scale="0 0 0">
+            <a-entity class="view br1go" data-locate="BR1A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="-80 -10 -20"
+            rotation="0 90 0"
+            scale="2 2 2"
+            data-scale="2 2 2"
+            animation__hoverin="property: scale; to: 2.2 2.2 2.2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 2 2 2; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/bed.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bedroom 1;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint BTH2A5K" visible="false" scale="0 0 0">
+            <a-entity class="view br2go" data-locate="BR2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="70 -10 32"
+            rotation="0 -90 0"
+            scale="2 2 2"
+            data-scale="2 2 2"
+            animation__hoverin="property: scale; to: 2.2 2.2 2.2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 2 2 2; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/bed.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Bedroom 2;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity class="hotpoint BTH3A5K" visible="false" scale="0 0 0">
+            <a-entity class="view lr2go" data-locate="LR2A5K"
+            hotspot-behavior
+            geometry="primitive: circle; radius: 3; segments: 120"
+            material="color: #ffffff; opacity: 0.15; transparent: true; shader: flat; depthWrite: false"
+            look-at="[camera]"
+            position="30 -10 80"
+            rotation="0 180 0"
+            scale="2 2 2"
+            data-scale="2 2 2"
+            animation__hoverin="property: scale; to: 2.2 2.2 2.2; startEvents: mouseenter; dur: 180; easing: easeOutQuad"
+            animation__hoverout="property: scale; to: 2 2 2; startEvents: mouseleave; dur: 180; easing: easeOutQuad">
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/circle.png"
+                width="7"
+                height="7"
+                material="transparent: true; opacity: 0.45; blending: additive; depthWrite: false"
+                animation__pulse="property: scale; to: 1.15 1.15 1; dir: alternate; dur: 1200; loop: true; easing: easeInOutSine">
+            </a-plane>
+            <a-plane
+                src="https://narasimman-sha.github.io/lnsarchviz/icons/location.png"
+                width="3.5"
+                height="3.5"
+                material="transparent: true; opacity: 1; blending: additive; depthWrite: false">
+            </a-plane>
+            <a-entity class="label-popup"
+                position="0 -6 0">
+
+                <a-plane class="label-rect">
+                </a-plane>
+
+                <a-entity class="label-text"
+                text="value: Living Room;">
+                </a-entity>
+            </a-entity>
+            </a-entity>
+        </a-entity>
+        
+        <a-entity cursor="rayOrigin: mouse" raycaster="objects: .view, .label-popup"></a-entity>
+    </a-scene>
+</div>
+    <script>
+        const tourcontainer = document.querySelector('#tour-container');
+        let innerdome = document.querySelector('.innerdome');
+        let outerdome = document.querySelector('.outerdome');
+        let canvasEl;
+        let sceneEl = null;
+        let entitiyCam, actualCam;
+        let hotpoint = document.querySelectorAll('.hotpoint');
+        let view = document.querySelectorAll('.view');
+        let lr1go = document.querySelectorAll('.lr1go');
+        let lr2go = document.querySelectorAll('.lr2go');
+        let br1go = document.querySelectorAll('.br1go');
+        let br2go = document.querySelectorAll('.br2go');
+        let br3go = document.querySelectorAll('.br3go');
+        let kitchengo = document.querySelectorAll('.kitchengo');
+        let balconygo = document.querySelectorAll('.balconygo');
+        let storeroomgo = document.querySelectorAll('.storeroomgo');
+        let bth1go = document.querySelectorAll('.bth1go');
+        let bth2go = document.querySelectorAll('.bth2go');
+        let bth3go = document.querySelectorAll('.bth3go');
+        //console.log(lr1go, lr2go, br1go, br2go, br3go, kitchengo, balconygo, storeroomgo, bth1go, bth2go, bth3go)
+        let daytrigger = document.querySelector('#daytrigger');
+        let nighttrigger = document.querySelector('#nighttrigger');
+        let floorplan = document.querySelector('.floor-plan');
+        let levelselection = document.querySelector('.levelselection');
+        let posistion = document.querySelector('.posistion');
+        let side = document.querySelector('.side');
+        let labelpopup = document.querySelectorAll('.label-popup');
+        let labelrect = document.querySelectorAll('.label-rect');
+        let labeltext = document.querySelectorAll('.label-text');
+        let fsContainer = document.querySelector('.full-screen');
+        let fsEnter = document.querySelector('.fs-enter');
+        let fsExit = document.querySelector('.fs-exit');
+        let floatingui = document.querySelector('#floating-ui');
+        let floatcontent = document.querySelector('.float-content');
+        let closebtn = document.querySelector('.close-btn');
+        let planimage =  document.querySelector('#plan-image');
+        let planhotpoints = document.querySelectorAll('.plan-hotpoints > div');
+        let currentside = '0';
+        let currentposistion = posistion.value;
+        let level = '1';
+        let currenttime = 'day';
+        let bhk = 'bhk3';
+        let outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
+        let innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
+        planimage.setAttribute('src', `https://narasimman-sha.github.io/lnsarchviz/images/dayplan${bhk}.avif`);
+        // document.querySelectorAll('select').forEach(sl => {
+        //     sl.addEventListener('click', (e) => {
+                
+        //     });
+        // });
+        daytrigger.addEventListener('click', async () => {
+            if(currenttime == 'day') return
+            currenttime = 'day';
+            daytrigger.classList.add('tactive');
+            nighttrigger.classList.remove('tactive');
+            canvasEl.classList.add('scene-blur');
+            outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
+            innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
+            Promise.all([preloadImage(outerurl), preloadImage(innerurl)]).then(() => {
+                innerDomeTexture(innerurl);
+                outerDomeTexture(outerurl);
+                
+                // Remove blur after textures applied
+                setTimeout(() => {
+                    canvasEl.classList.remove('scene-blur');
+                }, 300);
+            })
+            .catch(err => {
+                console.error("Failed to load textures:", err);
+                canvasEl.classList.remove('scene-blur');
+            });
+        });
+        nighttrigger.addEventListener('click', async () => {
+            if(currenttime == 'night') return
+            currenttime = 'night';
+            daytrigger.classList.remove('tactive');
+            nighttrigger.classList.add('tactive');
+            canvasEl.classList.add('scene-blur');
+            outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
+            innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
+            Promise.all([preloadImage(outerurl), preloadImage(innerurl)]).then(() => {
+                innerDomeTexture(innerurl);
+                outerDomeTexture(outerurl);
+
+                // Remove blur after textures applied
+                setTimeout(() => {
+                    canvasEl.classList.remove('scene-blur');
+                }, 300);
+            })
+            .catch(err => {
+                console.error("Failed to load textures:", err);
+                canvasEl.classList.remove('scene-blur');
+            });
+        });
+
+        // Function to enter full screen
+        function enterFullScreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { // Safari support
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { // IE/Edge support
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Function to exit full screen
+        function exitFullScreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // Event listeners for your custom SVG buttons
+        fsEnter.addEventListener('click', enterFullScreen);
+        fsExit.addEventListener('click', exitFullScreen);
+
+        // Automatically sync UI and state whether triggered by buttons or 'Esc' key
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fsContainer.classList.add('is-fullscreen');
+            } else {
+                fsContainer.classList.remove('is-fullscreen');
+            }
+        });
+
+        floorplan.addEventListener('click', function () {
+            floatingui.classList.add('present');
+            floatcontent.classList.add('contentpresent');
+            console.log(currentposistion);
+            console.log(actualCam);
+            const euler = new THREE.Euler();
+            euler.setFromQuaternion(actualCam.quaternion, 'YXZ');
+
+            // Convert from radians to degrees
+            const angles = {
+              x: THREE.MathUtils.radToDeg(euler.x),
+              y: THREE.MathUtils.radToDeg(euler.y),
+              z: THREE.MathUtils.radToDeg(euler.z)
+            };
+            console.log(angles.y);
+            planhotpoints.forEach(function (ph) {
+                ph.classList.remove('phactive');
+                ph.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M621.5-338.5Q680-397 680-480t-58.5-141.5Q563-680 480-680t-141.5 58.5Q280-563 280-480t58.5 141.5Q397-280 480-280t141.5-58.5ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Z"/></svg>`;
+                ph.style.transform = `rotateZ(0deg)`;
+                if (ph.dataset.plocate === currentposistion) {
+                    ph.classList.add('phactive');
+                    ph.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M338.5-138.5Q280-197 280-280t58.5-141.5Q397-480 480-480t141.5 58.5Q680-363 680-280t-58.5 141.5Q563-80 480-80t-141.5-58.5ZM565-195q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35ZM280-474 80-674q80-80 183.5-123T480-840q113 0 216.5 43T880-674L680-474q-41-41-92-63.5T480-560q-57 0-108 22.5T280-474Zm6-106q42-30 91.5-45T480-640q53 0 101.5 14.5T674-582l88-88q-62-44-133.5-67T480-760q-77 0-148.5 23T198-670l88 90Zm194-60Zm0 360Z"/></svg>`;
+                    ph.style.transform = `rotateZ(${-(angles.y)}deg)`;
+                }
+            })
+            
+        });
+        closebtn.addEventListener('click', function () {
+            floatingui.classList.remove('present');
+            floatcontent.classList.remove('contentpresent');
+        });
+        floatingui.addEventListener('click', function (e) {
+            //console.log(e.target);
+            if (e.target !== floatingui) return
+            floatingui.classList.remove('present');
+            floatcontent.classList.remove('contentpresent');
+        });
+
+
+        function preloadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(url);
+                img.onerror = () => reject(new Error(`Failed to load ${url}`));
+                img.src = url;
+            });
+        }
+        levelselection.addEventListener('change', function() {
+            level = levelselection.value;
+            outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
+            outerDomeTexture(outerurl);
+        });
+        planhotpoints.forEach(function (php) {
+            php.addEventListener('click', function (e) {
+                floatingui.classList.remove('present');
+                floatcontent.classList.remove('contentpresent');
+                if (e.target.closest('div').dataset.plocate === currentposistion) return;
+                currentposistion = e.target.closest('div').dataset.plocate;
+                innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
+                innerDomeTexture(innerurl);
+                
+            });
+        })
+        posistion.addEventListener('change', function() {
+            currentposistion = posistion.value;
+            innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
+            //innerdome.setAttribute('material', 'src', innerurl);
+            console.log(currentposistion, innerurl)
+            innerDomeTexture(innerurl);
+        })
+        side.addEventListener('change', function() {
+            currentside = side.value;
+            outerdome.setAttribute('animation', 'to', `0 ${currentside} 0`);
+            outerdome.emit('rotatestart');
+        })
+
+        labelpopup.forEach(function(lp) {
+
+            lp.setAttribute('geometry', {
+                primitive: 'plane',
+                width: '18',
+                height: '5'
+            })
+            lp.setAttribute('material', {
+                color: '#ffffff',
+                opacity: '0',
+                transparent: 'true',
+                shader: 'flat',
+                depthWrite: 'false'
+            })
+            lp.setAttribute('visible', 'true');
+            lp.setAttribute('scale', '0 0 0');
+            lp.setAttribute('animation__show', {
+                property: 'scale',
+                to: '1 1 1',
+                dur: 300,
+                easing: 'easeOutQuad',
+                startEvents: 'lpscalingbegin'
+            });
+            lp.setAttribute('animation__hide', {
+                property: 'scale',
+                to: '0 0 0',
+                dur: 300,
+                easing: 'easeOutQuad',
+                startEvents: 'lpscalingend'
+            });
+        });
+        labelrect.forEach(function(lr) {
+
+            lr.setAttribute('material', {
+                transparent: 'true',
+                shader: 'flat',
+                depthWrite: 'false'
+            });
+            lr.setAttribute('width', '18');
+            lr.setAttribute('height', '5');
+            lr.setAttribute('position', '0 0 0');
+            lr.setAttribute('src', `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='100'><rect x='2' y='2' width='316' height='96' rx='40' ry='40' fill='white' fill-opacity='0.3' stroke='white' stroke-opacity='0.5' stroke-width='2'/></svg>`);
+        });
+
+        labeltext.forEach(function(lt) {
+
+            lt.setAttribute('text', {
+                align: 'center',
+                color: 'rgb(49, 49, 49)',
+                width: '65',
+                font: 'roboto',
+                shader: 'msdf',
+            });
+            lt.setAttribute('position', '0 0 0');
+        });
+        let cameraEl = null;
+        let zoomComp = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            sceneEl = document.querySelector('a-scene');
+            
+            console.log(sceneEl);
+                
+            if (sceneEl.hasLoaded) {
+                initAframeComponents();
+            } else {
+                sceneEl.addEventListener('loaded', initAframeComponents);
+            }
+        });
+
+        function initAframeComponents() {
+            canvasEl = sceneEl.canvas;
+            // dont delete entitiyCam and actualCam
+            entitiyCam = document.querySelector('a-entity[camera]');
+            actualCam = entitiyCam.getObject3D('camera');
+
+            cameraEl = document.querySelector('[camera]');
+            if (!cameraEl) {
+                console.error("Camera element not found");
+                return;
+            }
+            console.log("Camera element found:", cameraEl);
+
+            let retries = 0;
+
+            const waitForZoomComponent = setInterval(() => {
+                if (cameraEl && cameraEl.components['smooth-fov-zoom']) {
+                    zoomComp = cameraEl.components['smooth-fov-zoom'];
+                    console.log("Zoom component found:", zoomComp);
+                    clearInterval(waitForZoomComponent);
+                    attachHotspotListeners();  // Start listening only when ready
+                } else if (retries++ > 50) {
+                    console.error("smooth-fov-zoom component never initialized");
+                    clearInterval(waitForZoomComponent);
+                }
+            }, 50);
+            
+        }
+
+        function attachHotspotListeners() {
+            sceneEl.addEventListener('click', function(e) {
+                
+                let targetView = e.target.closest('.view');
+                let targetLabel = e.target.closest('.label-popup');
+
+                if (targetLabel && !targetView) {
+                    targetView = targetLabel.closest('.view');
+                }
+                
+                //console.log(targetView);
+                if (!targetView || !zoomComp) return;
+
+                currentposistion = targetView.dataset.locate;
+                //console.log(currentposistion);
+                if (!currentposistion) return;
+
+
+                innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
+                // let sceneEl = document.querySelector('a-scene');
+                //let canvasEl = sceneEl.canvas;
+                // let cameraEl = document.querySelector('[camera]');
+                //let zoomComp = cameraEl.components['smooth-fov-zoom'];
+
+                let targetZoomFov = zoomComp.isPortrait ? zoomComp.data.portraitZoomTarget : 50;
+
+                zoomComp.zoomTo(targetZoomFov, function() {
+                    //console.log('zoomcomp called')
+                    let imgLoader = new Image();
+                    imgLoader.crossOrigin = 'anonymous';
+                    //canvasEl.classList.add('scene-blur');
+                    imgLoader.onload = function() {
+                        //canvasEl.classList.remove('scene-blur');
+                        innerDomeTexture(innerurl);
+                        let defaultFov = zoomComp.activeBaseFov;
+                        zoomComp.zoomTo(defaultFov);
+                    };
+                    imgLoader.onerror = function() {
+                        console.log("Failed to load the 5K inner dome image.");
+                        zoomComp.zoomTo(zoomComp.activeBaseFov);
+                    };
+                    imgLoader.src = innerurl;
+                })
+            });
+        }
+        function outerDomeTexture(ou) {
+            outerdome.setAttribute('material', 'src', outerurl);
+        }
+        function innerDomeTexture(iu) {
+            innerdome.setAttribute('material', 'src', innerurl);
+            setVisible()
+        };
+        let previousPosition = null;
+        function setVisible() {
+            let innercheck = innerdome.getAttribute('material');
+            console.log(innercheck.src);
+            hotpoint.forEach(function(hp) {
+                if (previousPosition && hp.classList.contains(previousPosition) && !hp.classList.contains(currentposistion)) {
+                    console.log(hp);
+                    hp.setAttribute('visible', false);
+                    hp.setAttribute('scale', '0 0 0');
+                    let insidehp = hp.querySelectorAll('.view');
+                    insidehp.forEach(function(ihp) {
+                        //console.log(ihp);
+                        ihp.removeAttribute('animation__scale'); // Clear previous animations
+                        ihp.setAttribute('animation__scale', {
+                            property: 'scale',
+                            to: '0 0 0',
+                            dur: 800,
+                            easing: 'easeInQuad'
+                        });
+                    });
+                }
+                if(hp.classList.contains(currentposistion)) {
+                    hp.setAttribute('visible', true);
+                    hp.setAttribute('scale', '1 1 1');
+                    console.log(hp, 'called');
+                    let insidehp = hp.querySelectorAll('.view');
+                    insidehp.forEach(function(ihp) {
+                        let originalScale = ihp.getAttribute('data-scale') || '1 1 1';
+                        ihp.removeAttribute('animation__scale'); // Clear previous animations
+                        ihp.setAttribute('animation__scale', {
+                            property: 'scale',
+                            to: originalScale,
+                            dur: 800, // Animation duration in milliseconds
+                            easing: 'easeOutQuad'
+                        });
+                    });
+                }
+            });
+            previousPosition = currentposistion;
+        }
+        outerDomeTexture(outerurl);
+        innerDomeTexture(innerurl);
+        outerdome.setAttribute('rotation', `0 ${currentside} 0`);
+        console.log(outerurl, innerurl);
+    </script>
+    <script>
+        AFRAME.registerComponent('hotspot-behavior', {
+            init: function () {
+                const el = this.el;
+                //console.log(el)
+                const label = el.querySelector('.label-popup');
+                if (!label) return;
+
+                this.label = label;
+                this.camEl = document.querySelector('[camera]');
+                this.vector = new THREE.Vector3();
+                
+                this.screenHalfWidth = window.innerWidth / 2;
+                this.screenMinX = window.innerWidth * 0.25;
+                this.screenMaxX = window.innerWidth * 0.75;
+
+                el.dataset.isHovered = "false";
+                this.isLabelVisible = false;
+                this.frameCounter = 0;
+                this.calculateFrequency = 4;
+
+                el.addEventListener('mouseenter', () => {
+                    el.dataset.isHovered = "true";
+                    //label.setAttribute('visible', true);
+                    this.setLabelVisible(true);
+                })
+                el.addEventListener('mouseleave', () => {
+                    el.dataset.isHovered = "false";
+                    //label.setAttribute('visible', false);
+                })
+                window.addEventListener('resize', () => {
+                    this.screenHalfWidth = window.innerWidth / 2;
+                    this.screenMinX = window.innerWidth * 0.25;
+                    this.screenMaxX = window.innerWidth * 0.75;
+                });
+                
+            },
+            setLabelVisible: function (visible) {
+                if (this.isLabelVisible !== visible) {
+                    this.isLabelVisible = visible;
+                    
+                    //this.label.setAttribute('visible', visible);
+                    // const scale = visible ? '1 1 1' : '0 0 0';
+                    // this.label.setAttribute('scale', scale);
+                    if (visible) {
+                        console.log(visible)
+                        this.label.emit('lpscalingbegin');
+                    } else {
+                        console.log(visible)
+                        this.label.emit('lpscalingend');
+                    }
+                }
+            },
+            tick: function () {
+
+                if (!this.camEl || !this.label) return;
+
+                if (this.frameCounter++ % this.calculateFrequency !== 0) {
+                    return;
+                }
+
+                const sceneEl = this.el.sceneEl;
+                if (!sceneEl || !sceneEl.camera) return;
+
+                const camera = sceneEl.camera;
+
+                // Get world position of the hotspot
+                this.el.object3D.lookAt(this.camEl.object3D.position);
+                this.el.object3D.getWorldPosition(this.vector);
+
+                // Project 3D coordinate to 2D screen space (-1 to +1)
+                this.vector.project(camera);
+
+                // Convert to pixel coordinates based on actual window size
+                const screenX = (this.vector.x * this.screenHalfWidth) + this.screenHalfWidth;
+                const isInCenter = this.vector.z < 1 && screenX >= this.screenMinX && screenX <= this.screenMaxX;
+                const isHovered = this.el.dataset.isHovered === "true";
+
+                if (isInCenter || isHovered) {
+                    this.setLabelVisible(true);
+                } else {
+                    this.setLabelVisible(false);
+                }
+            }
+        });
+        AFRAME.registerComponent('smooth-fov-zoom', {
+            schema: {
+                minFov: {default: 25},
+                maxFov: {default: 82.5},
+                zoomSpeed: {default: 3}, 
+                pinchSpeed: {default: 0.125}, 
+                damping: {default: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 0.3 : 0.15},
+
+                // Landscape Settings (Desktop & Horizontal Mobile)
+                landscapeFov: {default: 57},
+                landscapeRotateSpeed: {default: -0.175},
+
+                // Portrait Settings (Vertical Mobile)
+                portraitFov: {default: 82.5},
+                portraitZoomTarget: {default: 70},
+                portraitRotateSpeed: {default: -0.4}, // Faster to compensate for narrow screen
+                
+                // Speed when zoomed all the way in
+                minRotateSpeed: {default: -0.09}      
+            },
+            init: function () {
+                // 1. Detect initial orientation
+                this.isPortrait = window.innerWidth < window.innerHeight;
+                this.activeBaseFov = this.isPortrait ? this.data.portraitFov : this.data.landscapeFov;
+                this.activeBaseSpeed = this.isPortrait ? this.data.portraitRotateSpeed : this.data.landscapeRotateSpeed;
+            
+                this.targetFov = this.activeBaseFov;
+                this.currentFov = this.targetFov;
+                this.initialPinchDistance = null;
+                this.onZoomComplete = null;
+
+                this.lastAppliedFov = this.currentFov;
+                this.lastAppliedSpeed = this.activeBaseSpeed;
+
+                this.el.setAttribute('camera', 'fov', this.currentFov);
+                // 2. Bind methods
+                this.onWheel = this.onWheel.bind(this);
+                this.onTouchMove = this.onTouchMove.bind(this);
+                this.onTouchEnd = this.onTouchEnd.bind(this);
+                this.onResize = this.onResize.bind(this);
+            
+                // 3. Add Listeners
+                window.addEventListener('wheel', this.onWheel, {passive: false});
+                window.addEventListener('touchmove', this.onTouchMove, {passive: false});
+                window.addEventListener('touchend', this.onTouchEnd);
+                window.addEventListener('resize', this.onResize);
+            
+                // 4. Set initial speed on load
+                this.updateControlsSpeed(this.activeBaseSpeed);
+            },
+            zoomTo: function (fovValue, callback) {
+                this.targetFov = fovValue;
+                this.clampFov();
+                this.onZoomComplete = callback || null;
+            },
+            onResize: function () {
+                let newIsPortrait = window.innerWidth < window.innerHeight;
+
+                // Only trigger if the orientation actually flipped
+            if (newIsPortrait !== this.isPortrait) {
+                // Figure out what percentage zoomed in we currently are (0 = fully zoomed out, 1 = fully zoomed in)
+                let zoomPercent = (this.activeBaseFov - this.targetFov) / (this.activeBaseFov - this.data.minFov);
+                zoomPercent = Math.max(0, Math.min(1, zoomPercent)); 
+                
+                // Update orientation states
+                this.isPortrait = newIsPortrait;
+                this.activeBaseFov = this.isPortrait ? this.data.portraitFov : this.data.landscapeFov;
+                this.activeBaseSpeed = this.isPortrait ? this.data.portraitRotateSpeed : this.data.landscapeRotateSpeed;
+                
+                // Maintain the same zoom percentage on the new FOV!
+                this.targetFov = this.activeBaseFov - (zoomPercent * (this.activeBaseFov - this.data.minFov));
+                this.clampFov();
+                }
+            },
+            onWheel: function (e) {
+                this.targetFov += Math.sign(e.deltaY) * this.data.zoomSpeed;
+                this.clampFov();
+            },
+            onTouchMove: function (e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+                if (e.touches.length === 2) {
+                    let dist = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+                    if (this.initialPinchDistance === null) {
+                    this.initialPinchDistance = dist;
+                    } else {
+                        let delta = this.initialPinchDistance - dist;
+                        this.targetFov += delta * this.data.pinchSpeed;
+                        this.initialPinchDistance = dist;
+                        this.clampFov();
+                    }
+                }
+            },
+            onTouchEnd: function () {
+                this.initialPinchDistance = null;
+            },
+            clampFov: function () {
+                // Prevent zooming out further than the active default FOV or the absolute max
+                let maxBound = Math.max(this.data.maxFov, this.activeBaseFov);
+                this.targetFov = Math.max(this.data.minFov, Math.min(maxBound, this.targetFov));
+            },
+            updateControlsSpeed: function (speed) {
+                // Helper function to apply speeds to orbit-controls
+                this.el.setAttribute('orbit-controls', 'rotateSpeed', speed);
+                this.el.setAttribute('orbit-controls', 'panSpeed', speed);
+            },
+            tick: function () {
+                if (Math.abs(this.targetFov - this.currentFov) > 0.05) {
+                    this.currentFov += (this.targetFov - this.currentFov) * this.data.damping;
+        
+                    // Only update DOM if change exceeds threshold
+                    if (Math.abs(this.lastAppliedFov - this.currentFov) > 0.1) {
+                        this.el.setAttribute('camera', 'fov', this.currentFov);
+                        this.lastAppliedFov = this.currentFov;
+                    }
+                    
+                // Blend between the active base speed and the minimum speed based on zoom percentage
+                let zoomPercent = (this.activeBaseFov - this.currentFov) / (this.activeBaseFov - this.data.minFov);
+                zoomPercent = Math.max(0, Math.min(1, zoomPercent)); 
+                    
+                let dynamicSpeed = this.activeBaseSpeed - (zoomPercent * (this.activeBaseSpeed - this.data.minRotateSpeed));
+
+                if (Math.abs(this.lastAppliedSpeed - dynamicSpeed) > 0.001) {
+                    this.updateControlsSpeed(dynamicSpeed);
+                    this.lastAppliedSpeed = dynamicSpeed;
+                }
+                //this.updateControlsSpeed(dynamicSpeed);
+                } else if (this.onZoomComplete) {
+                    let cb = this.onZoomComplete;
+                    this.onZoomComplete = null;
+                    cb();
+                }
+            },
+            remove: function () {
+                window.removeEventListener('wheel', this.onWheel);
+                window.removeEventListener('touchmove', this.onTouchMove);
+                window.removeEventListener('touchend', this.onTouchEnd);
+                window.removeEventListener('resize', this.onResize);
+            }
+        });
+    </script>
+</body>
+</html>
