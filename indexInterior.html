@@ -1945,7 +1945,7 @@
             foundFlat = group.flats.find(flat => flat.id === targetFlatId);
             if (foundFlat) break; // Stop searching once found
         }
-        console.log(foundFlat.id);
+        //console.log(foundFlat.id);
         const tourcontainer = document.querySelector('#tour-container');
         let innerdome = document.querySelector('.innerdome');
         let outerdome = document.querySelector('.outerdome');
@@ -1984,11 +1984,15 @@
         let planimage =  document.querySelector('#plan-image');
         let planhotpoints = document.querySelectorAll('.plan-hotpoints > div');
 
-        let dynamiclevel = levelselection.querySelector(`option[data-floor="${foundFlat.floor}"]`);
+        let dynamiclevel, dynamicside;
+        if (foundFlat) {
+            dynamiclevel = levelselection.querySelector(`option[data-floor="${foundFlat.floor}"]`);
+            dynamicside = side.querySelector(`option[data-side="${foundFlat.facing}"]`);
+        };
+        
         levelselection.value = dynamiclevel?.value || '1';
         let level = levelselection.value;
 
-        let dynamicside = side.querySelector(`option[data-side="${foundFlat.facing}"]`);
         side.value = dynamicside?.value || '0';
         let currentside = side.value;
 
@@ -2230,6 +2234,10 @@
         });
 
         function initAframeComponents() {
+            outerDomeTexture(outerurl);
+            innerDomeTexture(innerurl);
+            outerdome.setAttribute('rotation', `0 ${currentside} 0`);
+            console.log(outerurl, innerurl);
             canvasEl = sceneEl.canvas;
             // dont delete entitiyCam and actualCam
             entitiyCam = document.querySelector('a-entity[camera]');
@@ -2284,31 +2292,101 @@
 
                 let targetZoomFov = zoomComp.isPortrait ? zoomComp.data.portraitZoomTarget : 50;
 
-                zoomComp.zoomTo(targetZoomFov, function() {
-                    //console.log('zoomcomp called')
-                    let imgLoader = new Image();
-                    imgLoader.crossOrigin = 'anonymous';
+                zoomComp.zoomTo(targetZoomFov, async function() {
+                    
+                    console.log('zoomcomp called')
+                    // let imgLoader = new Image();
+                    // imgLoader.crossOrigin = 'anonymous';
                     //canvasEl.classList.add('scene-blur');
-                    imgLoader.onload = function() {
-                        //canvasEl.classList.remove('scene-blur');
-                        innerDomeTexture(innerurl);
-                        let defaultFov = zoomComp.activeBaseFov;
-                        zoomComp.zoomTo(defaultFov);
-                    };
-                    imgLoader.onerror = function() {
-                        console.log("Failed to load the 5K inner dome image.");
-                        zoomComp.zoomTo(zoomComp.activeBaseFov);
-                    };
-                    imgLoader.src = innerurl;
+                    // imgLoader.onload = function() {
+                    //     //canvasEl.classList.remove('scene-blur');
+                    await innerDomeTexture(innerurl);
+                    let defaultFov = zoomComp.activeBaseFov;
+                    zoomComp.zoomTo(defaultFov);
+                    // };
+                    // imgLoader.onerror = function() {
+                    //     console.log("Failed to load the 5K inner dome image.");
+                    //     zoomComp.zoomTo(zoomComp.activeBaseFov);
+                    // };
+                    // imgLoader.src = innerurl;
                 })
             });
         }
-        function outerDomeTexture(ou) {
-            outerdome.setAttribute('material', 'src', outerurl);
-        }
-        function innerDomeTexture(iu) {
-            innerdome.setAttribute('material', 'src', innerurl);
-            setVisible()
+        async function outerDomeTexture(url) {
+            //outerdome.setAttribute('material', 'src', outerurl);
+            let mesh = outerdome.getObject3D('mesh');
+            if (!mesh) return;
+            try {
+                // Fetch and decode asynchronously inside the texture function
+                let response = await fetch(url);
+                let blob = await response.blob();
+                let imageBitmap = await createImageBitmap(blob, { imageOrientation: 'flipY' });
+
+                let material = mesh.material;
+        
+                // Dispose old texture map to prevent memory leaks and VRAM bloat
+                if (material.map) {
+                    material.map.dispose();
+                }
+
+                // Create Three.js texture from the decoded bitmap
+                let texture = new THREE.CanvasTexture(imageBitmap);
+        
+                // Performance optimizations
+                texture.generateMipmaps = false;
+                texture.minFilter = THREE.LinearFilter;
+                texture.magFilter = THREE.LinearFilter;
+
+                texture.colorSpace = THREE.SRGBColorSpace;
+                texture.needsUpdate = true;
+
+                material.map = texture;
+                material.needsUpdate = true;
+
+                // if (typeof setVisible === 'function') {
+                //     setVisible();
+                // }
+            } catch (err) {
+                console.log("Failed to load or decode outer dome image:", err);
+            }
+        };
+        async function innerDomeTexture(url) {
+            let mesh = innerdome.getObject3D('mesh');
+            if (!mesh) return;
+            try {
+                // Fetch and decode asynchronously inside the texture function
+                let response = await fetch(url);
+                let blob = await response.blob();
+                let imageBitmap = await createImageBitmap(blob, { imageOrientation: 'flipY' });
+
+                let material = mesh.material;
+        
+                // Dispose old texture map to prevent memory leaks and VRAM bloat
+                if (material.map) {
+                    material.map.dispose();
+                }
+
+                // Create Three.js texture from the decoded bitmap
+                let texture = new THREE.CanvasTexture(imageBitmap);
+        
+                // Performance optimizations
+                texture.generateMipmaps = false;
+                texture.minFilter = THREE.LinearFilter;
+                texture.magFilter = THREE.LinearFilter;
+
+                texture.colorSpace = THREE.SRGBColorSpace;
+                texture.needsUpdate = true;
+
+                material.map = texture;
+                material.needsUpdate = true;
+
+                if (typeof setVisible === 'function') {
+                    setVisible();
+                }
+            } catch (err) {
+                console.log("Failed to load or decode inner dome image:", err);
+            }
+            
         };
         let previousPosition = null;
         function setVisible() {
@@ -2350,10 +2428,7 @@
             });
             previousPosition = currentposistion;
         }
-        outerDomeTexture(outerurl);
-        innerDomeTexture(innerurl);
-        outerdome.setAttribute('rotation', `0 ${currentside} 0`);
-        console.log(outerurl, innerurl);
+        
     </script>
     <script>
         AFRAME.registerComponent('hotspot-behavior', {
