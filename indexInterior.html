@@ -2331,7 +2331,7 @@
 
                 // Create Three.js texture from the decoded bitmap
                 let texture = new THREE.CanvasTexture(imageBitmap);
-        
+                texture.flipY = false;
                 // Performance optimizations
                 texture.generateMipmaps = false;
                 texture.minFilter = THREE.LinearFilter;
@@ -2368,7 +2368,7 @@
 
                 // Create Three.js texture from the decoded bitmap
                 let texture = new THREE.CanvasTexture(imageBitmap);
-        
+                texture.flipY = false;
                 // Performance optimizations
                 texture.generateMipmaps = false;
                 texture.minFilter = THREE.LinearFilter;
