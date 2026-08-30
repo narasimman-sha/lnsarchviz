@@ -1343,7 +1343,7 @@
     <div class="main-container">
         <div class="container">
             <div class="child-container">
-            <video id="main-video" crossorigin="anonymous" onloadedmetadata="this.playbackRate = 1.0;" playsinline webkit-playsinline muted disabledPictureInPicture></video>
+            <video id="main-video" onloadedmetadata="this.playbackRate = 1.0;" playsinline webkit-playsinline muted disabledPictureInPicture></video>
             <!-- <video id="background-video" src="video/Clouds1.mp4" onloadedmetadata="this.playbackRate = 0.5;" autoplay loop muted></video> -->
             <canvas id="freeze-canvas"></canvas>
             
@@ -2096,35 +2096,14 @@
 
         const floorcontainer = document.querySelector('.floor-container');
         
-        async function playWithCanvasBuffer(newSrc, p, currentRotation) {
+        function playWithCanvasBuffer(newSrc, p, currentRotation) {
             console.log(newSrc, p, currentRotation)
             console.log('playcanvas called');
-try {
-        // Alternative approach: Extract frame via createImageBitmap (bypasses direct drawImage limitations on mobile)
-        if (mainvideo.readyState >= 2 && mainvideo.videoWidth > 0 && mainvideo.videoHeight > 0) {
-            const frameBitmap = await createImageBitmap(mainvideo);
-            
             canvas.width = mainvideo.videoWidth;
             canvas.height = mainvideo.videoHeight;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(frameBitmap, 0, 0);
-            
-            // Close the bitmap to free up mobile GPU memory
-            frameBitmap.close();
-            canvas.style.opacity = 1;
-            console.log("Successfully captured frame via createImageBitmap");
-        }
-    } catch (err) {
-        console.warn("createImageBitmap failed, falling back to standard draw:", err);
-        // Fallback safety net
-        if (mainvideo.videoWidth > 0) {
-            canvas.width = mainvideo.videoWidth;
-            canvas.height = mainvideo.videoHeight;
+            // below code freeze the last frame in canvas
             ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-            canvas.style.opacity = 1;
-        }
-    }
+            console.log(newSrc);
             mainvideo.src = newSrc;
             mainvideo.load();
             console.log(p)
@@ -2165,17 +2144,17 @@ try {
                     mainvideo.onloadeddata = null;
                 };
             }
-            else if(p === 'pause') {
+            if(p === 'pause') {
                 canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
                     mainvideo.currentTime = 0;
                     console.log(mainvideo.currentTime);
                     // 6. Once the new video is actually playing, hide the canvas
                     canvas.animate(
-                        [{ opacity: 1 }, { opacity: 0.25 }],
+                        [{ opacity: 1 }, { opacity: 0 }],
                         { duration: 500, easing: 'ease' }
                         ).onfinish = () => {
-                        canvas.style.opacity = 0.25;
+                        canvas.style.opacity = 0;
                     };
                     // Clear the listener
                     mainvideo.onloadeddata = null;
@@ -2183,7 +2162,6 @@ try {
             }
             
         }
-
         
         async function moveLeft() {
             if (isplaying) return;
