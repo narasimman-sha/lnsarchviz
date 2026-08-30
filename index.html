@@ -2097,13 +2097,20 @@
         const floorcontainer = document.querySelector('.floor-container');
         
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
-            console.log(newSrc, p, currentRotation)
-            console.log('playcanvas called');
-            canvas.width = mainvideo.videoWidth;
-            canvas.height = mainvideo.videoHeight;
-            // below code freeze the last frame in canvas
-            ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-            console.log(newSrc);
+            // console.log(newSrc, p, currentRotation)
+            // console.log('playcanvas called');
+            // canvas.width = mainvideo.videoWidth;
+            // canvas.height = mainvideo.videoHeight;
+            // // below code freeze the last frame in canvas
+            // ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            // console.log(newSrc);
+
+            if (mainvideo.videoWidth > 0 && mainvideo.videoHeight > 0) {
+                canvas.width = mainvideo.videoWidth;
+                canvas.height = mainvideo.videoHeight;
+                ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            }
+
             mainvideo.src = newSrc;
             mainvideo.load();
             console.log(p)
