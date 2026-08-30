@@ -2100,21 +2100,6 @@
         const floorcontainer = document.querySelector('.floor-container');
         
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
-            mainvideo.pause();
-    mainvideo.currentTime = 0; // Seek to start
-    
-    // Wait for the video to actually seek
-    mainvideo.addEventListener('seeked', drawToCanvas, { once: true });
-    
-    function drawToCanvas() {
-        console.log('Video seeked, attempting draw...');
-        canvas.width = mainvideo.videoWidth;
-        canvas.height = mainvideo.videoHeight;
-        
-        ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-        console.log('✅ Frame drawn to canvas');
-    }
-    
             
             // console.log(newSrc, p, currentRotation)
             // console.log('playcanvas called');
@@ -2150,16 +2135,26 @@
             if(p === 'play') {
                 canvas.style.opacity = 0.75;
                 mainvideo.onloadeddata = () => {
-                
-                if ('requestVideoFrameCallback' in mainvideo) {
-                mainvideo.requestVideoFrameCallback(() => {
-                    // This runs EXACTLY when the first new frame renders!
+                    // Start playing to allow drawing
+                    mainvideo.play().then(() => {
+                        // Draw immediately after play starts
+                        requestAnimationFrame(() => {
+                            canvas.width = mainvideo.videoWidth;
+                            canvas.height = mainvideo.videoHeight;
+                    
+                            try {
+                                ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+                                console.log('✅ Frame drawn while video playing');
+                            } catch (err) {
+                                console.error('Draw failed:', err);
+                            }
                     console.log("First frame officially rendered:", mainvideo.currentTime);
                     outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
                     floor.forEach(f => {
                         f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
                     });
                     canvas.style.opacity = 0.5;
+                    });
                     });
                 }
                 else {
