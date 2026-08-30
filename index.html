@@ -2096,7 +2096,7 @@
 
         const floorcontainer = document.querySelector('.floor-container');
         
-        function playWithCanvasBuffer(newSrc, p, currentRotation) {
+        async function playWithCanvasBuffer(newSrc, p, currentRotation) {
             console.log(newSrc, p, currentRotation)
             console.log('playcanvas called');
             await captureCanvasFrame();
