@@ -82,16 +82,13 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 100%;
             height: 100%;
-            /* object-fit: contain; */
-            aspect-ratio: 3/2;
-            background-color: red;
-            z-index: 3;
-            opacity: 0.5;
+            object-fit: contain;
+            z-index: 2;
+            opacity: 0;
             border-radius: 15px;
             pointer-events: none;
-            will-change: opacity;
+            will-change: transform;
         }
         #left-btn {
             position: absolute;
@@ -2100,77 +2097,46 @@
         const floorcontainer = document.querySelector('.floor-container');
         
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
-            
-            // console.log(newSrc, p, currentRotation)
-            // console.log('playcanvas called');
-            // canvas.width = mainvideo.videoWidth;
-            // canvas.height = mainvideo.videoHeight;
-            
-            // canvas.style.width = '100%';
-            // canvas.style.height = '100%';
-            // // below code freeze the last frame in canvas
-            // ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-            // console.log(newSrc);
-
-            // if (mainvideo.readyState < 2) {
-            //     console.warn('Video not ready, waiting...');
-            //     mainvideo.addEventListener('loadedmetadata', () => {
-            //         attemptCanvasDraw();
-            //     }, { once: true });
-            // } else {
-            //     attemptCanvasDraw();
-            // }
-
-            // function attemptCanvasDraw() {
-            //     if (mainvideo.videoWidth > 0 && mainvideo.videoHeight > 0) {
-            //         canvas.width = mainvideo.videoWidth;
-            //         canvas.height = mainvideo.videoHeight;
-            //         ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-            //     }
-            // };
+            console.log(newSrc, p, currentRotation)
+            console.log('playcanvas called');
+            canvas.width = mainvideo.videoWidth;
+            canvas.height = mainvideo.videoHeight;
+            // below code freeze the last frame in canvas
+            ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            console.log(newSrc);
 
             mainvideo.src = newSrc;
             mainvideo.load();
             console.log(p)
             if(p === 'play') {
-                canvas.style.opacity = 0.75;
+                canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
-                    // Start playing to allow drawing
-                    mainvideo.play().then(() => {
-                        // Draw immediately after play starts
-                        requestAnimationFrame(() => {
-                            canvas.width = mainvideo.videoWidth;
-                            canvas.height = mainvideo.videoHeight;
-                    
-                            try {
-                                ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-                                console.log('✅ Frame drawn while video playing');
-                            } catch (err) {
-                                console.error('Draw failed:', err);
-                            }
+                
+                if ('requestVideoFrameCallback' in mainvideo) {
+                mainvideo.requestVideoFrameCallback(() => {
+                    // This runs EXACTLY when the first new frame renders!
                     console.log("First frame officially rendered:", mainvideo.currentTime);
                     outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
                     floor.forEach(f => {
                         f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
                     });
-                    canvas.style.opacity = 0.5;
-                    });
+                    canvas.style.opacity = 0;
                     });
                 }
-                // else {
-                //     mainvideo.play().then(() => {
-                //         console.log(mainvideo.currentTime)
-                //         floor.forEach(f => {
-                //             //console.log(f)
-                //             f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
-                //         })
+                else {
+                    mainvideo.play().then(() => {
+                        console.log(mainvideo.currentTime)
+                        floor.forEach(f => {
+                            //console.log(f)
+                            f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
+                        })
                     
-                //         // 6. Once the new video is actually playing, hide the canvas
-                //         setTimeout(() => {
-                //             canvas.style.opacity = 0.5;
-                //         }, 50)
-                //     })
-                // }
+                        // 6. Once the new video is actually playing, hide the canvas
+                        setTimeout(() => {
+                            canvas.style.opacity = 0;
+                        }, 50)
+                    })
+                }
                 mainvideo.play().catch(err => {
                     console.error("Autoplay prevented or error:", err);
                 });
@@ -2180,22 +2146,23 @@
                 };
             }
             if(p === 'pause') {
-                canvas.style.opacity = 0.75;
+                canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
                     mainvideo.currentTime = 0;
                     console.log(mainvideo.currentTime);
                     // 6. Once the new video is actually playing, hide the canvas
                     canvas.animate(
-                        [{ opacity: 1 }, { opacity: 0.5 }],
+                        [{ opacity: 1 }, { opacity: 0 }],
                         { duration: 500, easing: 'ease' }
                         ).onfinish = () => {
-                        canvas.style.opacity = 0.5;
+                        canvas.style.opacity = 0;
                     };
                     // Clear the listener
                     mainvideo.onloadeddata = null;
                 };
             }
-       
+            
+        }
         
         async function moveLeft() {
             if (isplaying) return;
