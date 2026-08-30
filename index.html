@@ -2099,8 +2099,32 @@
         async function playWithCanvasBuffer(newSrc, p, currentRotation) {
             console.log(newSrc, p, currentRotation)
             console.log('playcanvas called');
-            await captureCanvasFrame();
-
+try {
+        // Alternative approach: Extract frame via createImageBitmap (bypasses direct drawImage limitations on mobile)
+        if (mainvideo.readyState >= 2 && mainvideo.videoWidth > 0 && mainvideo.videoHeight > 0) {
+            const frameBitmap = await createImageBitmap(mainvideo);
+            
+            canvas.width = mainvideo.videoWidth;
+            canvas.height = mainvideo.videoHeight;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(frameBitmap, 0, 0);
+            
+            // Close the bitmap to free up mobile GPU memory
+            frameBitmap.close();
+            canvas.style.opacity = 1;
+            console.log("Successfully captured frame via createImageBitmap");
+        }
+    } catch (err) {
+        console.warn("createImageBitmap failed, falling back to standard draw:", err);
+        // Fallback safety net
+        if (mainvideo.videoWidth > 0) {
+            canvas.width = mainvideo.videoWidth;
+            canvas.height = mainvideo.videoHeight;
+            ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            canvas.style.opacity = 1;
+        }
+    }
             mainvideo.src = newSrc;
             mainvideo.load();
             console.log(p)
@@ -2159,61 +2183,7 @@
             }
             
         }
-async function captureCanvasFrame() {
-    return new Promise((resolve) => {
-        // If video dimensions aren't available yet, resolve immediately
-        if (mainvideo.videoWidth === 0 || mainvideo.videoHeight === 0) {
-            console.warn('Video dimensions not ready, skipping capture');
-            resolve(false);
-            return;
-        }
 
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = mainvideo.videoWidth;
-        tempCanvas.height = mainvideo.videoHeight;
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        mainvideo.play().then(() => {
-            setTimeout(() => {
-                try {
-                    // Draw from playing video
-                    tempCtx.drawImage(mainvideo, 0, 0);
-                    
-                    // Convert to blob and redraw to main canvas (fixes mobile restrictions)
-                    tempCanvas.toBlob((blob) => {
-                        const url = URL.createObjectURL(blob);
-                        const img = new Image();
-                        
-                        img.onload = () => {
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            ctx.drawImage(img, 0, 0);
-                            console.log('✅ Canvas frame captured successfully');
-                            URL.revokeObjectURL(url);
-                            mainvideo.pause();
-                            resolve(true);
-                        };
-                        
-                        img.onerror = () => {
-                            console.error('Image load failed');
-                            mainvideo.pause();
-                            resolve(false);
-                        };
-                        
-                        img.src = url;
-                    });
-                } catch (err) {
-                    console.error('Capture failed:', err);
-                    mainvideo.pause();
-                    resolve(false);
-                }
-            }, 50);
-        }).catch(err => {
-            console.error('Play failed:', err);
-            resolve(false);
-        });
-    });
-}
         
         async function moveLeft() {
             if (isplaying) return;
