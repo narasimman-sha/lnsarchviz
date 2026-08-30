@@ -82,13 +82,14 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            width: 100%;
             height: 100%;
-            object-fit: contain;
+            /* object-fit: contain; */
             z-index: 2;
             opacity: 0.5;
             border-radius: 15px;
             pointer-events: none;
-            will-change: transform;
+            will-change: opacity;
         }
         #left-btn {
             position: absolute;
@@ -2097,30 +2098,33 @@
         const floorcontainer = document.querySelector('.floor-container');
         
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
-            // console.log(newSrc, p, currentRotation)
-            // console.log('playcanvas called');
-            // canvas.width = mainvideo.videoWidth;
-            // canvas.height = mainvideo.videoHeight;
-            // // below code freeze the last frame in canvas
-            // ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-            // console.log(newSrc);
+            console.log(newSrc, p, currentRotation)
+            console.log('playcanvas called');
+            canvas.width = mainvideo.videoWidth;
+            canvas.height = mainvideo.videoHeight;
+            
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            // below code freeze the last frame in canvas
+            ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            console.log(newSrc);
 
-            if (mainvideo.readyState < 2) {
-                console.warn('Video not ready, waiting...');
-                mainvideo.addEventListener('loadedmetadata', () => {
-                    attemptCanvasDraw();
-                }, { once: true });
-            } else {
-                attemptCanvasDraw();
-            }
+            // if (mainvideo.readyState < 2) {
+            //     console.warn('Video not ready, waiting...');
+            //     mainvideo.addEventListener('loadedmetadata', () => {
+            //         attemptCanvasDraw();
+            //     }, { once: true });
+            // } else {
+            //     attemptCanvasDraw();
+            // }
 
-            function attemptCanvasDraw() {
-                if (mainvideo.videoWidth > 0 && mainvideo.videoHeight > 0) {
-                    canvas.width = mainvideo.videoWidth;
-                    canvas.height = mainvideo.videoHeight;
-                    ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-                }
-            };
+            // function attemptCanvasDraw() {
+            //     if (mainvideo.videoWidth > 0 && mainvideo.videoHeight > 0) {
+            //         canvas.width = mainvideo.videoWidth;
+            //         canvas.height = mainvideo.videoHeight;
+            //         ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            //     }
+            // };
 
             mainvideo.src = newSrc;
             mainvideo.load();
