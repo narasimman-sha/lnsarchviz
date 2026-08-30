@@ -2100,20 +2100,21 @@
         const floorcontainer = document.querySelector('.floor-container');
         
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
-            mainvideo.pause(); // Pause first
+            mainvideo.pause();
+    mainvideo.currentTime = 0; // Seek to start
     
-            // Small delay to ensure pause is processed
-            setTimeout(() => {
-                canvas.width = mainvideo.videoWidth;
-                canvas.height = mainvideo.videoHeight;
+    // Wait for the video to actually seek
+    mainvideo.addEventListener('seeked', drawToCanvas, { once: true });
+    
+    function drawToCanvas() {
+        console.log('Video seeked, attempting draw...');
+        canvas.width = mainvideo.videoWidth;
+        canvas.height = mainvideo.videoHeight;
         
-                try {
-                    ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-                    console.log('✅ drawImage succeeded');
-                } catch (error) {
-                    canvas.style.backgroundColor = 'blue';
-                    
-                }
+        ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+        console.log('✅ Frame drawn to canvas');
+    }
+    
             
             // console.log(newSrc, p, currentRotation)
             // console.log('playcanvas called');
@@ -2199,7 +2200,6 @@
                     mainvideo.onloadeddata = null;
                 };
             }
-        }, 10);
         }
         
         async function moveLeft() {
