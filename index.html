@@ -1346,7 +1346,7 @@
     <div class="main-container">
         <div class="container">
             <div class="child-container">
-            <video id="main-video" onloadedmetadata="this.playbackRate = 1.0;" playsinline webkit-playsinline muted disabledPictureInPicture></video>
+            <video id="main-video" crossorigin="anonymous" onloadedmetadata="this.playbackRate = 1.0;" playsinline webkit-playsinline muted disabledPictureInPicture></video>
             <!-- <video id="background-video" src="video/Clouds1.mp4" onloadedmetadata="this.playbackRate = 0.5;" autoplay loop muted></video> -->
             <canvas id="freeze-canvas"></canvas>
             
@@ -2100,16 +2100,31 @@
         const floorcontainer = document.querySelector('.floor-container');
         
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
-            console.log(newSrc, p, currentRotation)
-            console.log('playcanvas called');
-            canvas.width = mainvideo.videoWidth;
-            canvas.height = mainvideo.videoHeight;
+            mainvideo.pause(); // Pause first
+    
+            // Small delay to ensure pause is processed
+            setTimeout(() => {
+                canvas.width = mainvideo.videoWidth;
+                canvas.height = mainvideo.videoHeight;
+        
+                try {
+                    ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+                    console.log('✅ drawImage succeeded');
+                } catch (error) {
+                    canvas.style.backgroundColor = 'blue';
+                    
+                }
             
-            canvas.style.width = '100%';
-            canvas.style.height = '100%';
-            // below code freeze the last frame in canvas
-            ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-            console.log(newSrc);
+            // console.log(newSrc, p, currentRotation)
+            // console.log('playcanvas called');
+            // canvas.width = mainvideo.videoWidth;
+            // canvas.height = mainvideo.videoHeight;
+            
+            // canvas.style.width = '100%';
+            // canvas.style.height = '100%';
+            // // below code freeze the last frame in canvas
+            // ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            // console.log(newSrc);
 
             // if (mainvideo.readyState < 2) {
             //     console.warn('Video not ready, waiting...');
@@ -2184,7 +2199,7 @@
                     mainvideo.onloadeddata = null;
                 };
             }
-            
+        }, 10);
         }
         
         async function moveLeft() {
