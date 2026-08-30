@@ -46,7 +46,7 @@
             aspect-ratio: 3 / 2;
             overflow: hidden;
             border-radius: 20px;
-            will-change: transform;
+            /* will-change: transform; */
         }
         .container .child-container {
             position: absolute;
@@ -59,8 +59,12 @@
             will-change: transform;
             transition: 0.5s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
-        .container child-container.tracking {
+        .container .child-container.tracking {
             transition: none !important;
+        }
+        .container.is-dragging .bhk2,
+        .container.is-dragging .bhk3 {
+            pointer-events: none !important;
         }
         #main-video {
             display: block;
@@ -74,7 +78,7 @@
             transform: translate(-50%, -50%);
             z-index: 1;
             border-radius: 15px;
-            will-change: transform;
+            /* will-change: transform; */
         }
         #freeze-canvas {
             display: block;
@@ -88,7 +92,7 @@
             opacity: 0;
             border-radius: 15px;
             pointer-events: none;
-            will-change: transform;
+            /* will-change: transform; */
         }
         #left-btn {
             position: absolute;
@@ -2100,8 +2104,14 @@
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
             console.log(newSrc, p, currentRotation)
             console.log('playcanvas called');
-            canvas.width = mainvideo.videoWidth;
-            canvas.height = mainvideo.videoHeight;
+
+            if (canvas.width !== mainvideo.videoWidth && mainvideo.videoWidth > 0) {
+                canvas.width = mainvideo.videoWidth;
+                canvas.height = mainvideo.videoHeight;
+            }
+
+            // canvas.width = mainvideo.videoWidth;
+            // canvas.height = mainvideo.videoHeight;
             // below code freeze the last frame in canvas
             ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
             console.log(newSrc);
@@ -2432,6 +2442,7 @@
             if (newHeight !== lastHeight) {
                 lastHeight = newHeight;
                 syncWidth();
+                cachedContainerRect = null;
                 // smallmap.style.width = `${newHeight * 0.125}px`;
                 // smallmap.style.height = `${newHeight * 0.125}px`;
             }
@@ -2480,11 +2491,20 @@
         let startDistance = 0;
         let startScale = 1;
         let zoom = 3.0;
+
+        let cachedContainerRect = null;
+        let cachedImgWidth = null;
+        let cachedImgHeight = null;
+
         function updateTransform(s) {
             console.log('update transoform called')
-            let containerRect = container.getBoundingClientRect();
-            let imgWidth = img.offsetWidth;
-            let imgHeight = img.offsetHeight;
+
+            if (!cachedContainerRect || s === 1) {
+                containerRect = container.getBoundingClientRect();
+                imgWidth = img.offsetWidth;
+                imgHeight = img.offsetHeight;
+            }
+            
             //console.log(containerRect, imgWidth, imgHeight)
             let maxTransX = Math.max(0, (imgWidth * scale - containerRect.width) / 2);
             let maxTransY = Math.max(0, (imgHeight * scale - containerRect.height) / 2);
@@ -2539,6 +2559,7 @@
         container.addEventListener('mousedown', (e) => {
             if (scale > 1) {
                 isDragging = true;
+                
                 img.classList.add('tracking');
                 startX = e.clientX - posX;
                 startY = e.clientY - posY;
@@ -2548,82 +2569,84 @@
 
         container.addEventListener('mousemove', (e) => {
             if (isDragging) {
+                container.classList.add('is-dragging');
                 posX = e.clientX - startX;
                 posY = e.clientY - startY;
                 updateTransform();
-                bhk2.forEach((b2) => {
-                    console.log('uT b2 called');
-                    b2.style.pointerEvents = 'none';
-                })
-                bhk3.forEach((b3) => {
-                    console.log('uT b3 called');
-                    b3.style.pointerEvents = 'none';
-                })
+                // bhk2.forEach((b2) => {
+                //     console.log('uT b2 called');
+                //     b2.style.pointerEvents = 'none';
+                // })
+                // bhk3.forEach((b3) => {
+                //     console.log('uT b3 called');
+                //     b3.style.pointerEvents = 'none';
+                // })
             }
-            if (!isDragging) {
-                bhk2.forEach((b2) => {
-                   // console.log('uT b2 1 called');
-                    if (planecontainer.classList.contains('is-hidden-3d')) {
-                        b2.style.pointerEvents = 'none';
-                    }
-                    else if (b2.parentElement.classList.contains('is-hidden-3d')) {
-                        b2.style.pointerEvents = 'none';
-                    }
-                    else if (b2.classList.contains('is-hidden-3d')) {
-                        b2.style.pointerEvents = 'none';
-                    }
-                    else if (!planecontainer.classList.contains('is-hidden-3d')) {
-                        b2.style.pointerEvents = 'visible';
-                    }
-                    else if (!b2.parentElement.classList.contains('is-hidden-3d')) {
-                        b2.style.pointerEvents = 'visible';
-                    }
-                    else if (!b2.classList.contains('is-hidden-3d')) {
-                        b2.style.pointerEvents = 'visible';
-                    }
-                })
-                bhk3.forEach((b3) => {
-                    //console.log('uT b3 1 called');
-                    if (planecontainer.classList.contains('is-hidden-3d')) {
-                        b3.style.pointerEvents = 'none';
-                    }
-                    else if (b3.parentElement.classList.contains('is-hidden-3d')) {
-                        b3.style.pointerEvents = 'none';
-                    }
-                    else if (b3.classList.contains('is-hidden-3d')) {
-                        b3.style.pointerEvents = 'none';
-                    }
-                    else if (!planecontainer.classList.contains('is-hidden-3d')) {
-                        b3.style.pointerEvents = 'visible';
-                    }
-                    else if (!b3.parentElement.classList.contains('is-hidden-3d')) {
-                        b3.style.pointerEvents = 'visible';
-                    }
-                    else if (!b3.classList.contains('is-hidden-3d')) {
-                        b3.style.pointerEvents = 'visible';
-                    }
-                })
-            }
+            // if (!isDragging) {
+            //     bhk2.forEach((b2) => {
+            //        // console.log('uT b2 1 called');
+            //         if (planecontainer.classList.contains('is-hidden-3d')) {
+            //             b2.style.pointerEvents = 'none';
+            //         }
+            //         else if (b2.parentElement.classList.contains('is-hidden-3d')) {
+            //             b2.style.pointerEvents = 'none';
+            //         }
+            //         else if (b2.classList.contains('is-hidden-3d')) {
+            //             b2.style.pointerEvents = 'none';
+            //         }
+            //         else if (!planecontainer.classList.contains('is-hidden-3d')) {
+            //             b2.style.pointerEvents = 'visible';
+            //         }
+            //         else if (!b2.parentElement.classList.contains('is-hidden-3d')) {
+            //             b2.style.pointerEvents = 'visible';
+            //         }
+            //         else if (!b2.classList.contains('is-hidden-3d')) {
+            //             b2.style.pointerEvents = 'visible';
+            //         }
+            //     })
+            //     bhk3.forEach((b3) => {
+            //         //console.log('uT b3 1 called');
+            //         if (planecontainer.classList.contains('is-hidden-3d')) {
+            //             b3.style.pointerEvents = 'none';
+            //         }
+            //         else if (b3.parentElement.classList.contains('is-hidden-3d')) {
+            //             b3.style.pointerEvents = 'none';
+            //         }
+            //         else if (b3.classList.contains('is-hidden-3d')) {
+            //             b3.style.pointerEvents = 'none';
+            //         }
+            //         else if (!planecontainer.classList.contains('is-hidden-3d')) {
+            //             b3.style.pointerEvents = 'visible';
+            //         }
+            //         else if (!b3.parentElement.classList.contains('is-hidden-3d')) {
+            //             b3.style.pointerEvents = 'visible';
+            //         }
+            //         else if (!b3.classList.contains('is-hidden-3d')) {
+            //             b3.style.pointerEvents = 'visible';
+            //         }
+            //     })
+            // }
         });
         // check it run all the time...
         container.addEventListener('mouseup', () => {
             isDragging = false;
+            container.classList.remove('is-dragging');
             img.classList.remove('tracking');
             updateTransform();
-            if (planecontainer.classList.contains('is-hidden-3d')) return
-            bhk2.forEach((b2) => {
-                console.log('uT b2 2 called');
-                if (b2.parentElement.classList.contains('is-hidden-3d')) return
-                if (b2.classList.contains('is-hidden-3d')) return
-                b2.style.pointerEvents = 'visible';
-            })
-            bhk3.forEach((b3) => {
-                console.log('uT b3 2 called');
-                if (b3.parentElement.classList.contains('is-hidden-3d')) return
-                if (b3.classList.contains('is-hidden-3d')) return
-                b3.style.pointerEvents = 'visible';
-                //console.log(b3, 'called')
-            })
+            // if (planecontainer.classList.contains('is-hidden-3d')) return
+            // bhk2.forEach((b2) => {
+            //     console.log('uT b2 2 called');
+            //     if (b2.parentElement.classList.contains('is-hidden-3d')) return
+            //     if (b2.classList.contains('is-hidden-3d')) return
+            //     b2.style.pointerEvents = 'visible';
+            // })
+            // bhk3.forEach((b3) => {
+            //     console.log('uT b3 2 called');
+            //     if (b3.parentElement.classList.contains('is-hidden-3d')) return
+            //     if (b3.classList.contains('is-hidden-3d')) return
+            //     b3.style.pointerEvents = 'visible';
+            //     //console.log(b3, 'called')
+            // })
         });
         container.addEventListener('touchstart', (e) => {
             img.classList.add('tracking');
@@ -2638,6 +2661,7 @@
             } else if (e.touches.length === 1 && scale > 1) {
                 // One finger & Zoomed in: Setup Panning
                 isDragging = true;
+                
                 startX = e.touches[0].clientX - posX;
                 startY = e.touches[0].clientY - posY;
             }
@@ -2658,6 +2682,7 @@
             } else if (e.touches.length === 1 && isDragging && scale > 1) {
                 // One finger & Zoomed in: Execute Panning
                 e.preventDefault(); // Stop HTML page from trying to scroll
+                container.classList.add('is-dragging');
                 posX = e.touches[0].clientX - startX;
                 posY = e.touches[0].clientY - startY;
                 updateTransform();
@@ -2670,6 +2695,7 @@
             if (e.touches.length < 2) startDistance = 0;
             if (e.touches.length === 0) {
                 isDragging = false;
+                container.classList.remove('is-dragging');
                 img.classList.remove('tracking');
             }
             updateTransform();
