@@ -2157,20 +2157,20 @@
                     });
                     });
                 }
-                else {
-                    mainvideo.play().then(() => {
-                        console.log(mainvideo.currentTime)
-                        floor.forEach(f => {
-                            //console.log(f)
-                            f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
-                        })
+                // else {
+                //     mainvideo.play().then(() => {
+                //         console.log(mainvideo.currentTime)
+                //         floor.forEach(f => {
+                //             //console.log(f)
+                //             f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
+                //         })
                     
-                        // 6. Once the new video is actually playing, hide the canvas
-                        setTimeout(() => {
-                            canvas.style.opacity = 0.5;
-                        }, 50)
-                    })
-                }
+                //         // 6. Once the new video is actually playing, hide the canvas
+                //         setTimeout(() => {
+                //             canvas.style.opacity = 0.5;
+                //         }, 50)
+                //     })
+                // }
                 mainvideo.play().catch(err => {
                     console.error("Autoplay prevented or error:", err);
                 });
