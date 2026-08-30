@@ -2105,11 +2105,22 @@
             // ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
             // console.log(newSrc);
 
-            if (mainvideo.videoWidth > 0 && mainvideo.videoHeight > 0) {
-                canvas.width = mainvideo.videoWidth;
-                canvas.height = mainvideo.videoHeight;
-                ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            if (mainvideo.readyState < 2) {
+                console.warn('Video not ready, waiting...');
+                mainvideo.addEventListener('loadedmetadata', () => {
+                    attemptCanvasDraw();
+                }, { once: true });
+            } else {
+                attemptCanvasDraw();
             }
+
+            function attemptCanvasDraw() {
+                if (mainvideo.videoWidth > 0 && mainvideo.videoHeight > 0) {
+                    canvas.width = mainvideo.videoWidth;
+                    canvas.height = mainvideo.videoHeight;
+                    ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+                }
+            };
 
             mainvideo.src = newSrc;
             mainvideo.load();
