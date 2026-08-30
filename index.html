@@ -84,8 +84,8 @@
             transform: translate(-50%, -50%);
             height: 100%;
             object-fit: contain;
-            z-index: 3;
-            opacity: 0;
+            z-index: 2;
+            opacity: 0.5;
             border-radius: 15px;
             pointer-events: none;
             will-change: transform;
@@ -2126,7 +2126,7 @@
             mainvideo.load();
             console.log(p)
             if(p === 'play') {
-                canvas.style.opacity = 1;
+                canvas.style.opacity = 0.75;
                 mainvideo.onloadeddata = () => {
                 
                 if ('requestVideoFrameCallback' in mainvideo) {
@@ -2137,7 +2137,7 @@
                     floor.forEach(f => {
                         f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
                     });
-                    canvas.style.opacity = 0;
+                    canvas.style.opacity = 0.5;
                     });
                 }
                 else {
@@ -2150,7 +2150,7 @@
                     
                         // 6. Once the new video is actually playing, hide the canvas
                         setTimeout(() => {
-                            canvas.style.opacity = 0;
+                            canvas.style.opacity = 0.5;
                         }, 50)
                     })
                 }
@@ -2163,7 +2163,7 @@
                 };
             }
             if(p === 'pause') {
-                canvas.style.opacity = 1;
+                canvas.style.opacity = 0.75;
                 mainvideo.onloadeddata = () => {
                     mainvideo.currentTime = 0;
                     console.log(mainvideo.currentTime);
@@ -2172,7 +2172,7 @@
                         [{ opacity: 1 }, { opacity: 0 }],
                         { duration: 500, easing: 'ease' }
                         ).onfinish = () => {
-                        canvas.style.opacity = 0;
+                        canvas.style.opacity = 0.5;
                     };
                     // Clear the listener
                     mainvideo.onloadeddata = null;
