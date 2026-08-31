@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LnsArchviz</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <script src="script/mediabunny.cjs"></script>
     
     <style>
         :root {
@@ -82,7 +81,7 @@
             /* will-change: transform; */
         }
         #freeze-canvas {
-            display: none;
+            display: block;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -1349,8 +1348,7 @@
     <div class="main-container">
         <div class="container">
             <div class="child-container">
-            <!-- <video id="main-video" onloadedmetadata="this.playbackRate = 1.0;" playsinline webkit-playsinline muted disabledPictureInPicture></video> -->
-             <canvas id="main-video"></canvas>
+            <video id="main-video" onloadedmetadata="this.playbackRate = 1.0;" playsinline webkit-playsinline muted disabledPictureInPicture></video>
             <!-- <video id="background-video" src="video/Clouds1.mp4" onloadedmetadata="this.playbackRate = 0.5;" autoplay loop muted></video> -->
             <canvas id="freeze-canvas"></canvas>
             
@@ -1614,12 +1612,12 @@
     <script>
         let allvideo = {
             day: {
-                forward: ['https://narasimman-sha.github.io/lnsarchviz/video/Day/f1.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/f2.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/f3.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/f4.webm'],
-                backward: ['https://narasimman-sha.github.io/lnsarchviz/video/Day/r1.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/r2.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/r3.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/r4.webm']
+                forward: ['video/Day/f1.webm', 'video/Day/f2.webm', 'video/Day/f3.webm', 'video/Day/f4.webm'],
+                backward: ['video/Day/r1.webm', 'video/Day/r2.webm', 'video/Day/r3.webm', 'video/Day/r4.webm']
             },
             night: {
-                forward: ['https://narasimman-sha.github.io/lnsarchviz/video/Night/f1.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/f2.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/f3.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/f4.webm'],
-                backward: ['https://narasimman-sha.github.io/lnsarchviz/video/Night/r1.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/r2.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/r3.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/r4.webm']
+                forward: ['video/Night/f1.webm', 'video/Night/f2.webm', 'video/Night/f3.webm', 'video/Night/f4.webm'],
+                backward: ['video/Night/r1.webm', 'video/Night/r2.webm', 'video/Night/r3.webm', 'video/Night/r4.webm']
             }
             
         };
@@ -1804,7 +1802,6 @@
         let mainvideo = document.querySelector('#main-video');
         let canvas = document.querySelector('#freeze-canvas');
         let ctx = canvas.getContext('2d');
-        let ctxv = mainvideo.getContext('2d');
         let leftbtn = document.querySelector('#left-btn');
         let rightbtn = document.querySelector('#right-btn');
         let currentstep = 0;
@@ -1836,8 +1833,6 @@
         let right = document.querySelectorAll('.right');
         let back = document.querySelectorAll('.back');
         let isDragging = false;
-
-        const { Input, ALL_FORMATS, UrlSource, VideoSampleSink } = Mediabunny;
 
 
         const slider1 = document.getElementById("slider-1");
@@ -2105,109 +2100,84 @@
         });
 
         const floorcontainer = document.querySelector('.floor-container');
-
-        const videoMemoryCache = {};
         
-async function playWithCanvasBuffer(newSrc, p, currentRotation) {
-    console.log(newSrc, p, currentRotation);
-    console.log('playcanvas called');
+        function playWithCanvasBuffer(newSrc, p, currentRotation) {
+            console.log(newSrc, p, currentRotation)
+            console.log('playcanvas called');
 
-    canvas.style.opacity = 0;
+            if (canvas.width !== mainvideo.videoWidth && mainvideo.videoWidth > 0) {
+                canvas.width = mainvideo.videoWidth;
+                canvas.height = mainvideo.videoHeight;
+            }
 
-    // 1. Fetch, demux, and decode frames completely into memory if not already cached
-    let frameBitmaps = videoMemoryCache[newSrc];
-
-    if (!frameBitmaps) {
-        console.log("Decoding video into memory with Mediabunny...");
-        try {
-            const { Input, ALL_FORMATS, UrlSource, VideoSampleSink } = Mediabunny;
-            const input = new Input({
-                formats: ALL_FORMATS,
-                source: new UrlSource(newSrc),
-            });
-
-            const videoTrack = await input.getPrimaryVideoTrack();
-            if (!videoTrack) throw new Error('No video track found.');
-
-            const sink = new VideoSampleSink(videoTrack);
-            frameBitmaps = [];
-
-            for await (const sample of sink.samples()) {
-                if (sample) {
-                    const videoFrame = typeof sample.toVideoFrame === 'function' 
-                        ? sample.toVideoFrame() 
-                        : (sample.frame || sample);
-
-                    const bitmap = await createImageBitmap(videoFrame);
-                    frameBitmaps.push(bitmap);
-
-                    if (typeof videoFrame.close === 'function') videoFrame.close();
-                    if (typeof sample.close === 'function') sample.close();
+            // canvas.width = mainvideo.videoWidth;
+            // canvas.height = mainvideo.videoHeight;
+            // below code freeze the last frame in canvas
+            ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
+            console.log(newSrc);
+            mainvideo.src = "";
+            mainvideo.src = newSrc;
+            mainvideo.load();
+            console.log(p)
+            if(p === 'play') {
+                canvas.style.opacity = 1;
+                mainvideo.onloadeddata = () => {
+                
+                if ('requestVideoFrameCallback' in mainvideo) {
+                mainvideo.requestVideoFrameCallback(() => {
+                    // This runs EXACTLY when the first new frame renders!
+                    console.log("First frame officially rendered:", mainvideo.currentTime);
+                    outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
+                    
+                    updateRotationsSmoothly(currentRotation);
+                    // floor.forEach(f => {
+                    //     f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
+                    // });
+                    canvas.style.opacity = 0;
+                    });
                 }
-            }
+                else {
+                    mainvideo.play().then(() => {
+                        console.log(mainvideo.currentTime);
 
-            if (frameBitmaps.length === 0) throw new Error('No frames decoded.');
+                        updateRotationsSmoothly(currentRotation);
+                        // floor.forEach(f => {
+                        //     //console.log(f)
+                        //     f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
+                        // })
+                    
+                        // 6. Once the new video is actually playing, hide the canvas
+                        setTimeout(() => {
+                            canvas.style.opacity = 0;
+                        }, 50)
+                    })
+                }
+                mainvideo.play().catch(err => {
+                    console.error("Autoplay prevented or error:", err);
+                });
+
+                    // Clear the listener
+                    mainvideo.onloadeddata = null;
+                };
+            }
+            if(p === 'pause') {
+                canvas.style.opacity = 1;
+                mainvideo.onloadeddata = () => {
+                    mainvideo.currentTime = 0;
+                    console.log(mainvideo.currentTime);
+                    // 6. Once the new video is actually playing, hide the canvas
+                    canvas.animate(
+                        [{ opacity: 1 }, { opacity: 0 }],
+                        { duration: 500, easing: 'ease' }
+                        ).onfinish = () => {
+                        canvas.style.opacity = 0;
+                    };
+                    // Clear the listener
+                    mainvideo.onloadeddata = null;
+                };
+            }
             
-            // Cache decoded sequence in memory
-            videoMemoryCache[newSrc] = frameBitmaps;
-            console.log(`Loaded ${frameBitmaps.length} frames into memory.`);
-        } catch (err) {
-            console.error("Mediabunny decode error:", err);
-            setPlayingState(false);
-            return;
         }
-    }
-
-    // 2. Set canvas dimensions to match the decoded video frames
-    if (frameBitmaps.length > 0) {
-        if (mainvideo.width !== frameBitmaps[0].width || mainvideo.height !== frameBitmaps[0].height) {
-            mainvideo.width = frameBitmaps[0].width;
-            mainvideo.height = frameBitmaps[0].height;
-        }
-    }
-
-    // 3. Update rotation and layout state smoothly
-    outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
-    updateRotationsSmoothly(currentRotation);
-
-    // 4. Play back the frame sequence on the canvas
-    if (p === 'play') {
-        let currentIndex = 0;
-        const fpsInterval = 33; // ~30fps playback rate ticker
-
-        const playInterval = setInterval(() => {
-            if (currentIndex >= frameBitmaps.length) {
-                clearInterval(playInterval);
-                canvas.style.opacity = 0;
-                setPlayingState(false);
-                return;
-            }
-
-            const currentBitmap = frameBitmaps[currentIndex];
-            ctxv.clearRect(0, 0, mainvideo.width, mainvideo.height);
-            ctxv.drawImage(currentBitmap, 0, 0);
-
-            // Reveal canvas on the first frame draw
-            if (currentIndex === 0) {
-                mainvideo.style.opacity = 1;
-            }
-
-            currentIndex++;
-        }, fpsInterval);
-    } 
-    else if (p === 'pause') {
-        ctxv.clearRect(0, 0, mainvideo.width, mainvideo.height);
-        ctxv.drawImage(frameBitmaps[0], 0, 0);
-
-        canvas.animate(
-            [{ opacity: 1 }, { opacity: 1 }],
-            { duration: 500, easing: 'ease' }
-        ).onfinish = () => {
-            mainvideo.style.opacity = 1;
-            setPlayingState(false);
-        };
-    }
-}
 
         let ticking = false;
 
