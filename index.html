@@ -232,6 +232,8 @@
             transform: translate(-50%, -50%);
             height: 100%;
             opacity: 1;
+            /* will-change: transform; */
+            /* transform: translateZ(0); */
             /* don't delete it will works through js */
             /* perspective: 1000px; */
             object-fit: contain;
@@ -243,6 +245,20 @@
         .plane-container.is-hidden-3d div {
             pointer-events: none;
         }
+        .rotating-container {
+            height: 100%;
+            width: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            left: 0;
+            top: 0;
+            will-change: transform;
+            transform: translateZ(0);
+            transition-property: transform;
+            transition-duration: 1.6667s;
+            transition-timing-function: cubic-bezier(0.35, 0.00, 0.65, 1);
+            transition-delay: 0ms;
+        }
         .floor {
             position: absolute;
             transform-style: preserve-3d;
@@ -253,12 +269,12 @@
             align-items: center;
             opacity: 1;
             backface-visibility: visible;
-            will-change: transform;
+            /* will-change: transform;
             transform: translateZ(0);
             transition-property: transform;
             transition-duration: 1.6667s;
             transition-timing-function: cubic-bezier(0.35, 0.00, 0.65, 1);
-            transition-delay: 0ms;
+            transition-delay: 0ms; */
         }
 
         /* .floor.is-hidden-3d {
@@ -1353,6 +1369,7 @@
             <canvas id="freeze-canvas"></canvas>
             
             <div class="plane-container">
+                <div class="rotating-container">
                 <div class="floor1 floor" data-floor-id="floor1">
                     <div class="front">
                         <div class="bhk2 smallside" data-flat-id="Flat11">Flat 11</div>
@@ -1532,6 +1549,7 @@
                         <div class="bhk3 smallside" data-flat-id="Flat104">Flat 104</div>
                         <div class="bhk2 largeside" data-flat-id="Flat101">Flat 101</div>
                     </div>
+                </div>
                 </div>
             </div>
             </div>
@@ -1813,6 +1831,7 @@
         let daytrigger = document.querySelector('#daytrigger');
         let nighttrigger = document.querySelector('#nighttrigger');
         let planecontainer = document.querySelector('.plane-container');
+        let rotatingcontainer = document.querySelector('.rotating-container');
         let planebtn = document.querySelector('#plane-btn');
         let outercompass = document.querySelector('#outer-compass');
         let innercompass = document.querySelector('#inner-compass');
@@ -2185,10 +2204,11 @@
             if (!ticking) {
                 requestAnimationFrame(() => {
                     // Apply transform in a single batch to avoid layout thrashing
-                    const transformValue = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
-                    floor.forEach(f => {
-                        f.style.transform = transformValue;
-                    });
+                    const transformValue = `translateZ(0) rotate3d(0, 1, 0, ${currentRotation}deg)`;
+                    // floor.forEach(f => {
+                    //     f.style.transform = transformValue;
+                    // });
+                    rotatingcontainer.style.transform = transformValue;
                     ticking = false;
                 });
                 ticking = true;
