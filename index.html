@@ -2150,13 +2150,12 @@
             }
 
             // ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
-
             const cachedImg = firstFrameImages[timing][currentstep];
             console.log(cachedImg);
             if (cachedImg && cachedImg.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
-            }          
+            }
 
             //console.log(newSrc);
             mainvideo.src = "";
@@ -2204,19 +2203,20 @@
                     mainvideo.onloadeddata = null;
                 };
             }
-            if(p === 'pause') {
+            if (p === 'pause') {
                 canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
                     mainvideo.currentTime = 0;
                     console.log(mainvideo.currentTime);
+                    canvas.style.opacity = 0;
                     // 6. Once the new video is actually playing, hide the canvas
                     // for mobile no animation is done check duration and increase further
-                    canvas.animate(
-                        [{ opacity: 1 }, { opacity: 0 }],
-                        { duration: 0, easing: 'ease' }
-                        ).onfinish = () => {
-                        canvas.style.opacity = 0;
-                    };
+                    // canvas.animate(
+                    //     [{ opacity: 1 }, { opacity: 0 }],
+                    //     { duration: 5000, easing: 'ease' }
+                    //     ).onfinish = () => {
+                    //     canvas.style.opacity = 1;
+                    // };
                     // Clear the listener
                     mainvideo.onloadeddata = null;
                 };
