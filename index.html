@@ -2124,7 +2124,7 @@
             day: [],
             night: []
         };
-
+        let totalBytes = 0;
         const framePaths = {
             day: ['images/buffer/Day/f1.avif', 'images/buffer/Day/f2.avif', 'images/buffer/Day/f3.avif', 'images/buffer/Day/f4.avif'],
             night: ['images/buffer/Night/f1.avif', 'images/buffer/Night/f2.avif', 'images/buffer/Night/f3.avif', 'images/buffer/Night/f4.avif']
@@ -2156,8 +2156,8 @@
 
             const cachedImg = firstFrameImages[timing][currentstep];
             if (cachedImg && cachedImg.complete) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
+                //ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(cachedImg, 0, 0, mainvideo.videoWidth, mainvideo.videoHeight);
             }            
 
 
