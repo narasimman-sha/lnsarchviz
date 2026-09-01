@@ -2156,7 +2156,7 @@
 
             const cachedImg = firstFrameImages[timing][currentstep];
             if (cachedImg && cachedImg.complete) {
-                //ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
             }            
 
@@ -2181,7 +2181,6 @@
                     //     f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
                     // });
                     canvas.style.opacity = 0;
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
                     });
                 }
                 else {
@@ -2197,7 +2196,6 @@
                         // 6. Once the new video is actually playing, hide the canvas
                         setTimeout(() => {
                             canvas.style.opacity = 0;
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
                         }, 50)
                     })
                 }
@@ -2220,7 +2218,6 @@
                         { duration: 500, easing: 'ease' }
                         ).onfinish = () => {
                         canvas.style.opacity = 0;
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
                     };
                     // Clear the listener
                     mainvideo.onloadeddata = null;
