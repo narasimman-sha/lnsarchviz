@@ -2205,10 +2205,11 @@
             }
             if (p === 'pause') {
                 canvas.style.opacity = 1;
-                mainvideo.onloadeddata = () => {
-                    mainvideo.currentTime = 0;
-                    console.log(mainvideo.currentTime);
-                    canvas.style.opacity = 0;
+                if ('requestVideoFrameCallback' in mainvideo) {
+                    mainvideo.requestVideoFrameCallback(() => {
+                        mainvideo.currentTime = 0;
+                        console.log(mainvideo.currentTime);
+                        canvas.style.opacity = 0;
                     // 6. Once the new video is actually playing, hide the canvas
                     // for mobile no animation is done check duration and increase further
                     // canvas.animate(
@@ -2218,7 +2219,8 @@
                     //     canvas.style.opacity = 1;
                     // };
                     // Clear the listener
-                    mainvideo.onloadeddata = null;
+                    // mainvideo.onloadeddata = null;
+                    })
                 };
             }
             
