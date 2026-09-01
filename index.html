@@ -2139,7 +2139,7 @@
                 });
             });
         }
-        
+        preloadFirstFrames();
         function playWithCanvasBuffer(newSrc, p, currentRotation) {
             console.log(newSrc, p, currentRotation)
             console.log('playcanvas called');
@@ -2149,23 +2149,20 @@
                 canvas.height = mainvideo.videoHeight;
             }
 
-            // canvas.width = mainvideo.videoWidth;
-            // canvas.height = mainvideo.videoHeight;
-            // below code freeze the last frame in canvas
             // ctx.drawImage(mainvideo, 0, 0, canvas.width, canvas.height);
 
             const cachedImg = firstFrameImages[timing][currentstep];
+            console.log(cachedImg);
             if (cachedImg && cachedImg.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
-            }            
+            }          
 
-
-            console.log(newSrc);
+            //console.log(newSrc);
             mainvideo.src = "";
             mainvideo.src = newSrc;
             mainvideo.load();
-            console.log(p)
+            //console.log(p)
             if(p === 'play') {
                 canvas.style.opacity = 1;
                 mainvideo.onloadeddata = () => {
@@ -2213,9 +2210,10 @@
                     mainvideo.currentTime = 0;
                     console.log(mainvideo.currentTime);
                     // 6. Once the new video is actually playing, hide the canvas
+                    // for mobile no animation is done check duration and increase further
                     canvas.animate(
                         [{ opacity: 1 }, { opacity: 0 }],
-                        { duration: 500, easing: 'ease' }
+                        { duration: 0, easing: 'ease' }
                         ).onfinish = () => {
                         canvas.style.opacity = 0;
                     };
@@ -2770,7 +2768,6 @@
         });
         syncWidth();
         playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
-        preloadFirstFrames();
         updateSliders();
         applyFilters();
     </script>
