@@ -516,7 +516,7 @@
             width: 150px;
             height: 150px;
             top: 15px;
-            right: 15px;
+            left: 15px;
             /* background-color: rgba(255, 255, 255, 0.25); */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -559,6 +559,66 @@
             background-image: url(images/inner_compass.webp);
             transition: background 0.75s;
         }
+
+        #option-ui {
+            position: absolute;
+            right: 12px;
+            top: 15px;
+            display: flex;
+            flex-flow: column wrap;
+            gap: 6px;
+            z-index: 3;
+        }
+        .full-screen {
+            cursor: pointer;
+            transition: 0.35s;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        .full-screen:hover .fs-enter svg {
+            transform: scale(1.1);
+        }
+        .full-screen:hover .fs-exit svg {
+            transform: scale(0.85);
+        }
+        .fs-enter svg {
+            transition: 0.35s;
+        }
+        .fs-exit svg {
+            transition: 0.35s;
+        }
+        .full-screen .fs-exit {
+            display: none;
+        }
+        .full-screen.is-fullscreen .fs-enter {
+            display: none;
+        }
+        .full-screen.is-fullscreen .fs-exit {
+            display: block;
+            transform: scale(1.15);
+        }
+        .share-content {
+            cursor: pointer;
+            transition: 0.35s;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        .share-content svg {
+            transition: 0.35s;
+        }
+        .share-content:hover .sharing svg {
+            transform: scale(1.1);
+        }
         #smallmap {
             position: absolute;
             z-index: 3;
@@ -599,46 +659,47 @@
             transition: 0.35s;
         }
         .overlay {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
+            width: 100%;
+            height: 100%;
             visibility: hidden;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
+            opacity: 0;
+            transition: 0.2s;
             z-index: 6;
         }
         .modal {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 800px;
-            position: relative;
-            /* Start slightly smaller for a pop-in effect */
-            transform: scale(0.9);
-            transition: transform 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid white;
+            width: min(85vw, 85vh);
+            width: min(85dvw, 85dvh);
+            aspect-ratio: 1 / 1;
+            background-color: white;
+            border-radius: 25px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            transition: 0.5s;
+            overflow: hidden;
         }
         .overlay.active {
-            opacity: 1;
+            transform: scale(1);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             visibility: visible;
+            opacity: 1;
         }
 
         .overlay.active .modal {
-            transform: scale(1);
+            transform: translate(-50%, -50%) scale(1);
         }
         #close-map-btn {
             position: absolute;
             width: 32px;
-            top: 25px;
-            right: 24px;
+            top: 3%;
+            right: 3%;
             background: none;
             border: none;
             font-size: 32px;
@@ -656,7 +717,7 @@
         .iframe-container {
             margin-top: 0;
             width: 100%;
-            height: 60vh; /* Takes up 60% of viewport height */
+            height: 100%; /* Takes up 60% of viewport height */
             min-height: 300px;
             border-radius: 8px;
             overflow: hidden;
@@ -1167,7 +1228,7 @@
             }
             #smallcompass {
                 top: 10px;
-                right: 5px;
+                left: 5px;
                 width: 120px;
                 height: 120px;
             }
@@ -1245,9 +1306,9 @@
             .mapcontainer {
                 border-radius: 12px;
             }
-            .modal {
-                padding: 10px;
-            }
+            /* .modal {
+                padding: 10px;#
+            } */
         }
         @media screen and (max-width: 1100px) and (max-height: 600px) {
             .main-container {
@@ -1279,7 +1340,7 @@
             }
             #smallcompass {
                 top: 10px;
-                right: 5px;
+                left: 5px;
                 width: 90px;
                 height: 90px;
             }
@@ -1333,9 +1394,12 @@
                 font-size: 14px;
                 padding: 3px 6px;
             }
+            #option-ui {
+                right: 3px;
+            }
             #smallcompass {
                 top: 10px;
-                right: 5px;
+                left: 5px;
                 width: 90px;
                 height: 90px;
             }
@@ -1569,6 +1633,21 @@
                     <div id="inner-compass"></div>
                 </div>
             </div>
+            <div id="option-ui">
+                <div class="full-screen">
+                    <div class="fs-enter">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -1020 960 960" width="30px" fill="white"><path d="M120-120v-200h80v120h120v80H120Zm520 0v-80h120v-120h80v200H640ZM120-640v-200h200v80H200v120h-80Zm640 0v-120H640v-80h200v200h-80Z"/></svg>
+                    </div>
+                    <div class="fs-exit">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -1020 960 960" width="30px" fill="white"><path d="M240-120v-120H120v-80h200v200h-80Zm400 0v-200h200v80H720v120h-80ZM120-640v-80h120v-120h80v200H120Zm520 0v-200h80v120h120v80H640Z"/></svg>
+                    </div>
+                </div>
+                <div class="share-content">
+                    <div class="sharing">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -1020 960 960" width="30px" fill="white"><path d="M680-80q-50 0-85-35t-35-85q0-6 3-28L282-392q-16 15-37 23.5t-45 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q24 0 45 8.5t37 23.5l281-164q-2-7-2.5-13.5T560-760q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-24 0-45-8.5T598-672L317-508q2 7 2.5 13.5t.5 14.5q0 8-.5 14.5T317-452l281 164q16-15 37-23.5t45-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-80q17 0 28.5-11.5T720-200q0-17-11.5-28.5T680-240q-17 0-28.5 11.5T640-200q0 17 11.5 28.5T680-160ZM200-440q17 0 28.5-11.5T240-480q0-17-11.5-28.5T200-520q-17 0-28.5 11.5T160-480q0 17 11.5 28.5T200-440Zm508.5-291.5Q720-743 720-760t-11.5-28.5Q697-800 680-800t-28.5 11.5Q640-777 640-760t11.5 28.5Q663-720 680-720t28.5-11.5ZM680-200ZM200-480Zm480-280Z"/></svg>
+                    </div>
+                </div>
+            </div>
             <div id="smallmap">
                 <div class="mapcontainer">
                     <div class="mapimage"></div>
@@ -1588,7 +1667,7 @@
             <div class="modal">
                 <button id="close-map-btn" aria-label="Close Map">&times;</button>
                 <div class="iframe-container">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d2746.3441918861586!2d80.32900789195688!3d13.230512504829424!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1781359276067!5m2!1sen!2sin" width="1200" height="800" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3883.912422112816!2d80.32648757484615!3d13.230812487108878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0xab0f549b1c6a6408!2s68JH%2B8J%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1788326434446!5m2!1sen!2sin" width="1200" height="1200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
@@ -1835,6 +1914,9 @@
         let planebtn = document.querySelector('#plane-btn');
         let outercompass = document.querySelector('#outer-compass');
         let innercompass = document.querySelector('#inner-compass');
+        let fsContainer = document.querySelector('.full-screen');
+        let fsEnter = document.querySelector('.fs-enter');
+        let fsExit = document.querySelector('.fs-exit');
         let smallmap = document.querySelector('#smallmap');
         let mapimage = document.querySelector('.mapimage');
         let showcolors = document.querySelector('.showcolors');
@@ -2098,6 +2180,43 @@
                 planecontainer.classList.add('is-hidden-3d');
             }
         });
+
+        // Function to enter full screen
+        function enterFullScreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { // Safari support
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { // IE/Edge support
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Function to exit full screen
+        function exitFullScreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // Event listeners for your custom SVG buttons
+        fsEnter.addEventListener('click', enterFullScreen);
+        fsExit.addEventListener('click', exitFullScreen);
+
+        // Automatically sync UI and state whether triggered by buttons or 'Esc' key
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fsContainer.classList.add('is-fullscreen');
+            } else {
+                fsContainer.classList.remove('is-fullscreen');
+            }
+        });
+
         const mapOverlay = document.getElementById('map-overlay');
         const closeBtn = document.getElementById('close-map-btn');
 
