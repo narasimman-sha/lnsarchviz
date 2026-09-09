@@ -222,23 +222,24 @@
             cursor: pointer;
             transition: 0.4s;
             font-size: 1.1rem;
-            padding: 10px 8px 8px 8px;
             font-weight: 600;
             box-shadow: 3px 3px 6px rgba(88, 88, 88, 0.5);
         }
         .plan {
             justify-self: center;
             align-self: center;
-            text-align: center;
-            align-items: center;
+            padding: 10px 8px 8px 8px;
             cursor: pointer;
             font-weight: 500;
             font-size: 1.1rem;
             border-radius: 15px;
             width: 100%;
             height: 100%;
+            text-align: center;
+            align-items: center;
         }
         .posistion {
+            flex: 1 1 20%;
             display: none;
             top: 0px;
             left: 0px;
@@ -256,7 +257,6 @@
             cursor: pointer;
             transition: 0.4s;
             font-size: 1.1rem;
-            padding: 8px;
             font-weight: 600;
             box-shadow: 3px 3px 6px rgba(88, 88, 88, 0.5);
         }
@@ -266,8 +266,8 @@
         .side {
             display: flex;
             flex-flow: row nowrap;
-            justify-content: space-between;
-            gap: 1px;
+            justify-content: center;
+            gap: 4px;
             background: transparent;
             outline: none;
             border: 0px;
@@ -277,7 +277,7 @@
             border-radius: 15px;
             width: 100%;
             height: 100%;
-            padding-left: 4px;
+            padding: 8px 8px 8px 10px;
             justify-self: center;
             align-self: center;
             text-align: center;
@@ -293,13 +293,13 @@
             transform: rotate(180deg);
             
         }
-        .side:open {
-            /* background-color: #edf1f4;
-            transition: 0.35s; */
-        }
+        /* .side:open {
+            background-color: #edf1f4;
+            transition: 0.35s;
+        } */
 
         .side::picker(select) {
-            margin-left: -12px;
+            margin-left: -4px;
             margin-bottom: 8px;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(8px);
@@ -348,7 +348,7 @@
         }
         
         .floorselect {
-            /* width: 100px; */
+            width: 100px;
             height: 40px;
             display: flex;
             flex-flow: row nowrap;
@@ -359,7 +359,6 @@
             cursor: pointer;
             transition: 0.4s;
             font-size: 1.1rem;
-            padding: 8px 4px 8px 8px;
             font-weight: 600;
             box-shadow: 3px 3px 6px rgba(88, 88, 88, 0.5);
         }
@@ -374,8 +373,8 @@
         .levelselection {
             display: flex;
             flex-flow: row nowrap;
-            justify-content: space-between;
-            gap: 1px;
+            justify-content: center;
+            gap: 0px;
             background: transparent;
             outline: none;
             border: 0px;
@@ -385,7 +384,8 @@
             border-radius: 15px;
             width: 100%;
             height: 100%;
-            padding-left: 4px;
+            padding: 8px 4px 8px 8px;
+            text-wrap: nowrap;
             justify-self: center;
             align-self: center;
             text-align: center;
@@ -405,7 +405,7 @@
             transition: 0.35s;
         } */
         .levelselection::picker(select) {
-            margin-left: -12px;
+            margin-left: -6px;
             margin-bottom: 8px;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(8px);
@@ -463,7 +463,6 @@
             cursor: pointer;
             transition: 0.4s;
             font-size: 1.1rem;
-            padding: 10px 8px 8px 8px;
             font-weight: 600;
             box-shadow: 3px 3px 4px rgba(168, 60, 60, 0.5);
             transition: 0.35s;
@@ -484,6 +483,7 @@
             border-radius: 15px;
             width: 100%;
             height: 100%;
+            padding: 10px 8px 8px 8px;
         }
         
         #floating-ui {
@@ -738,11 +738,18 @@
             }
             .floorselect {
                 height: 30px;
-                padding: 4px; 
             }
+            /* .levelselection {
+                padding: 4px;
+            } */
             .booknow {
                 height: 30px;
                 padding: 4px; 
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .levelselection {
+                padding: 8px 0px 8px 8px;
             }
         }
     </style>
@@ -2139,6 +2146,32 @@
             outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
             outerDomeTexture(outerurl);
         });
+
+        levelselection.addEventListener('touchstart', function (event) {
+            console.log('levelselection called');
+            console.log(event.target.tagName.toLowerCase())
+            if (event.target.tagName.toLowerCase() === 'option') {
+                return;
+            };
+            if (levelselection.matches(':open')) {
+                event.preventDefault();
+                this.blur();
+                console.log('levelselection called 2');
+            }
+        })
+        side.addEventListener('touchstart', function (event) {
+            console.log('levelselection called');
+            console.log(event.target.tagName.toLowerCase())
+            if (event.target.tagName.toLowerCase() === 'option') {
+                return;
+            };
+            if (side.matches(':open')) {
+                event.preventDefault();
+                this.blur();
+                console.log('side called 2');
+            }
+        })
+        
         planhotpoints.forEach(function (php) {
             php.addEventListener('click', function (e) {
                 floatingui.classList.remove('present');
