@@ -912,7 +912,7 @@
                 font-size: 1.25rem;
             }
         }
-        @media screen and (max-width: 900px) and (max-height: 600px) {
+        @media screen and (max-width: 1000px) and (max-height: 600px) {
             .floor-plan {
                 height: 30px;
             }
@@ -926,7 +926,7 @@
                 height: 30px;
             }
             .book-content {
-                font-size: 1rem;
+                font-size: 0.6rem;
             }
         }
         @media screen and (max-width: 600px) {
@@ -1068,7 +1068,7 @@
                     </div>
                     <div class="bcdetails">
                         <div class="direct-contact">
-                            <a href="mailto:lnsarchviz@gmail.com?subject=Hello%20Support" class="email-container">
+                            <a href="" class="email-container">
                                 <img class="email-logo" src="icons/Email.avif"></img>
                                 <div class="email-heading">Email</div>
                                 <div class="email-address">lnsarchviz@gmail.com</div>
@@ -2222,6 +2222,7 @@
         let floatcontent = document.querySelector('.float-content');
         let plancontent = document.querySelector('.plan-content');
         let bookcontent = document.querySelector('.book-content');
+        let emailcontainer = document.querySelector('.email-container');
         let closebtn = document.querySelectorAll('.close-btn');
         let planimage =  document.querySelector('#plan-image');
         let planhotpoints = document.querySelectorAll('.plan-hotpoints > div');
@@ -2387,6 +2388,13 @@
                 bookcontent.classList.add('floathide');
             }, 350);
         }
+
+        emailcontainer.addEventListener('click', function(e) {
+            let currentUrl = window.location.href;
+            let currentSide = side.options[side.selectedIndex].dataset.side;
+            let currentLevel = levelselection.value;
+            this.href = `mailto:lnsarchviz@gmail.com?subject=Hello%20Support&body=Flat No: ${foundFlat.name}, Facing: ${currentSide}, Floor: ${currentLevel}, Shared Url: ${currentUrl}`;
+        });
 
         levelselection.addEventListener('change', function() {
             level = levelselection.value;
