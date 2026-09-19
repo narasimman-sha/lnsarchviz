@@ -2393,7 +2393,7 @@
             let currentUrl = window.location.href;
             let currentSide = side.options[side.selectedIndex].dataset.side;
             let currentLevel = levelselection.value;
-            this.href = `mailto:lnsarchviz@gmail.com?subject=Hello%20Support&body=Flat No: ${foundFlat.name}, Facing: ${currentSide}, Floor: ${currentLevel}, Shared Url: ${currentUrl}`;
+            this.href = `mailto:lnsarchviz@gmail.com?subject=Hello%20Support&body=Flat No: ${foundFlat.name},%0AFacing: ${currentSide},%0AFloor: ${currentLevel}%0A`;
         });
 
         levelselection.addEventListener('change', function() {
