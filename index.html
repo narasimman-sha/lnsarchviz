@@ -518,8 +518,8 @@
             top: 15px;
             left: 15px;
             /* background-color: rgba(255, 255, 255, 0.25); */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
             border-radius: 25%;
             overflow: hidden;
         }
@@ -658,7 +658,7 @@
             height: 100%;
             transition: 0.35s;
         }
-        .overlay {
+        #map-overlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -666,10 +666,19 @@
             height: 100%;
             visibility: hidden;
             opacity: 0;
-            transition: 0.2s;
+            transition: 0.35s;
             z-index: 6;
         }
-        .modal {
+        #map-overlay.present {
+            transform: scale(1);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            visibility: visible;
+            opacity: 1;
+            cursor: default;
+        }
+        .overlay {
             border: 3px solid white;
             width: min(85vw, 85vh);
             width: min(85dvw, 85dvh);
@@ -684,17 +693,22 @@
             overflow: hidden;
         }
         .overlay.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .modal {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        /* .overlay.active {
             transform: scale(1);
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             visibility: visible;
             opacity: 1;
-        }
-
-        .overlay.active .modal {
-            transform: translate(-50%, -50%) scale(1);
-        }
+            transition: 0.5s;
+        } */
         #close-map-btn {
             position: absolute;
             width: 32px;
@@ -728,6 +742,212 @@
             height: 100%;
             border: none;
         }
+        .book-content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content: space-around;
+            gap: 5px;
+            top: 0;
+            left: 0;
+            background-color: rgb(239, 239, 236);
+            font-size: 1.5rem;
+            padding: 5%;
+        }
+        .close-btn {
+            right: 2%;
+            top: 2%;
+            position: absolute;
+            cursor: pointer;
+            background-color: rgb(154, 83, 83);
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: 3px 3px 6px rgba(154, 83, 83, 0.5);
+            transition: 0.35s;
+        }
+        .close-btn:hover {
+            transform: scale(1.1);
+            background-color: rgb(154, 83, 83);
+            box-shadow: 4px 4px 8px rgba(154, 83, 83, 0.5);
+        }
+        .close-btn:hover svg {
+            transform: scale(1.4);
+            fill: #cdcdcd;
+        }
+        .close-btn svg {
+            height: 22px;
+            transition: 0.35s;
+            fill: white;
+        }
+        .bcheader {
+            flex: 1 1 15%;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+        }
+        .bcheader > div:nth-child(1) {
+            font-weight: 500;
+            font-size: 2em;
+            color: #3c3c3c;
+        }
+        .bcheader > div:nth-child(2) {
+            font-weight: 400;
+            font-size: 1.25em;
+            color: #898989;
+        }
+        .bcdetails {
+            flex: 1 1 70%;
+            display: flex;
+            flex-flow: column nowrap;
+            gap: 10%;
+        }
+        .direct-contact {
+            flex: 1 1 60%;
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-around;
+            gap: 5%;
+        }
+        .email-container {
+            flex: 1 1 45%;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 3px 3px 6px rgb(185, 185, 185);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 10px;
+            transition: 0.35s;
+        }
+        .email-container:hover {
+            transform: scale(1.05);
+            box-shadow: 4px 4px 8px rgb(207, 207, 207);
+        }
+        .email-logo {
+            width: 25% !important;
+        }
+        .email-heading {
+            font-size: 1em;
+            font-weight: 600;
+            color: #3c3c3c;
+            padding-bottom: 10px;
+        }
+        .email-address {
+            font-size: 0.75em;
+            font-weight: 600;
+            color:#898989;
+        }
+        .whatsapp-container {
+            flex: 1 1 45%;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 3px 3px 6px rgb(185, 185, 185);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 10px;
+            transition: 0.35s;
+        }
+        .whatsapp-container:hover {
+            transform: scale(1.05);
+            box-shadow: 4px 4px 8px rgb(207, 207, 207);
+        }
+        .whatsapp-logo {
+            padding-top: 10px;
+            width: 20% !important;
+        }
+        .whatsapp-heading {
+            font-size: 1em;
+            font-weight: 600;
+            color: #3c3c3c;
+            padding-bottom: 10px;
+        }
+        .whatsapp-address {
+            font-size: 0.75em;
+            font-weight: 600;
+            color:#898989;
+        }
+        .seperating-line {
+            position: relative;
+            /* height: 2px; */
+        }
+        .sltext {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            padding: 3px;
+            border-radius: 15px;
+            background-color: rgb(239, 239, 236);
+            color: rgb(120, 120, 120);
+        }
+        .slline {
+            border: 1px solid rgb(120, 120, 120);
+            z-index: 4;
+            border-radius: 5px;
+        }
+        .indirect-contact {
+            flex: 1 1 30%;
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 10%;
+            justify-content: center;
+            align-items: center;
+        }
+        .facebook-container {
+            flex: 0 0 12.5%;
+            justify-self: center;
+            display: flex;
+            justify-content: center;
+            transition: 0.35s;
+        }
+        .facebook-container:hover {
+            transform: scale(1.1);
+        }
+        /* .facebook-logo {
+            width: 60px !important;
+        } */
+        .instagram-container {
+            flex: 0 0 12.5%;
+            justify-self: center;
+            display: flex;
+            justify-content: center;
+            transition: 0.35s;
+        }
+        .instagram-container:hover {
+            transform: scale(1.1);
+        }
+        /* .instagram-logo {
+            width: 60px !important;
+        } */
+        .youtube-container {
+            flex: 0 0 15%;
+            justify-self: center;
+            display: flex;
+            justify-content: center;
+            transition: 0.35s;
+        }
+        .youtube-container:hover {
+            transform: scale(1.1);
+        }
+        /* .youtube-logo {
+            width: 75px !important;
+        } */
+
+        .floathide {
+            display: none;
+        }
         #planetrigger {
             display: flex;
             justify-content: center;
@@ -759,6 +979,27 @@
         #plane-btn:hover {
            border: 2px solid rgba(255, 255, 255, 0.3);
            color: #e3e3e3;
+        }
+        #book-btn {
+            position: absolute;
+            z-index: 3;
+            right: 15px;
+            bottom: 20px;
+            cursor: pointer;
+            background-color: rgba(220, 57, 57, 0.9);
+            box-shadow: 3px 3px 6px rgba(255, 0, 0, 0.25);
+            border-radius: 25px;
+            padding: 6px 12px;
+            transition: 0.35s;
+        }
+        #book-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 4px 4px 8px rgba(255, 0, 0, 0.20);
+        }
+        .book-txt {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
         }
         .showcolors {
             display: flex;
@@ -1310,7 +1551,7 @@
                 padding: 10px;#
             } */
         }
-        @media screen and (max-width: 1100px) and (max-height: 600px) {
+        @media screen and (max-width: 1000px) and (max-height: 600px) {
             .main-container {
                 padding: 0px 5px;
                 flex-flow: row nowrap;
@@ -1343,6 +1584,24 @@
                 left: 5px;
                 width: 90px;
                 height: 90px;
+            }
+            #book-btn {
+                right: 5px;
+                bottom: 10px;
+                box-shadow: 3px 3px 6px rgba(255, 0, 0, 0.25);
+                border-radius: 25px;
+                padding: 6px 12px;
+            }
+            #book-btn:hover {
+                box-shadow: 4px 4px 8px rgba(255, 0, 0, 0.20);
+            }
+            .book-txt {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: white;
+            }
+            .book-content {
+                font-size: 0.6rem;
             }
             #details-container {
                 flex: 1 1 35%;
@@ -1398,10 +1657,28 @@
                 right: 3px;
             }
             #smallcompass {
-                top: 10px;
+                top: 5px;
                 left: 5px;
-                width: 90px;
-                height: 90px;
+                width: 85px;
+                height: 85px;
+            }
+            #book-btn {
+                right: 5px;
+                bottom: 10px;
+                box-shadow: 3px 3px 6px rgba(255, 0, 0, 0.25);
+                border-radius: 25px;
+                padding: 6px 12px;
+            }
+            #book-btn:hover {
+                box-shadow: 4px 4px 8px rgba(255, 0, 0, 0.20);
+            }
+            .book-txt {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: white;
+            }
+            .book-content {
+                font-size: 1rem;
             }
             .ullist {
                 flex-flow: row wrap;
@@ -1662,12 +1939,55 @@
                 </div>
                 
             </div>
+            <div id="book-btn">
+                <div class="book-txt">Book</div>
+            </div>
         </div>
-        <div id="map-overlay" class="overlay">
-            <div class="modal">
-                <button id="close-map-btn" aria-label="Close Map">&times;</button>
-                <div class="iframe-container">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3883.912422112816!2d80.32648757484615!3d13.230812487108878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0xab0f549b1c6a6408!2s68JH%2B8J%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1788326434446!5m2!1sen!2sin" width="1200" height="1200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div id="map-overlay" class="">
+            <div class="overlay">
+                <div class="modal floathide">
+                    <button id="close-map-btn" aria-label="Close Map">&times;</button>
+                    <div class="iframe-container">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3883.912422112816!2d80.32648757484615!3d13.230812487108878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0xab0f549b1c6a6408!2s68JH%2B8J%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1788326434446!5m2!1sen!2sin" width="1200" height="1200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+                <div class="book-content floathide">
+                    <div class="bcheader">
+                        <div>Contact Us</div>
+                        <div>Get in Touch With Us!</div>
+                    </div>
+                    <div class="bcdetails">
+                        <div class="direct-contact">
+                            <a href="" class="email-container">
+                                <img class="email-logo" src="icons/Email.avif"></img>
+                                <div class="email-heading">Email</div>
+                                <div class="email-address">lnsarchviz@gmail.com</div>
+                            </a>
+                            <a href="https://wa.me/lnsarchviz" target="_blank" class="whatsapp-container">
+                                <img class="whatsapp-logo" src="icons/Whatsapp.avif"></img>
+                                <div class="whatsapp-heading">Whatsapp</div>
+                                <div class="whatsapp-address">@lnsarchviz</div>
+                            </a>
+                        </div>
+                        <div class="seperating-line">
+                            <div class="sltext">Follow Us</div>
+                            <div class="slline"></div>
+                        </div>
+                        <div class="indirect-contact">
+                            <a href="https://www.facebook.com/profile.php?id=100088228676914&mibextid=ZbWKwL" target="_blank" class="facebook-container">
+                                <img class="facebook-logo" src="icons/Facebook.avif"></img>
+                            </a>
+                            <a href="https://instagram.com/lns_archviz?igshid=ZDdkNTZiNTM=" target="_blank" class="instagram-container">
+                                <img class="instagram-logo" src="icons/Instagram.avif"></img>
+                            </a>
+                            <a href="https://www.youtube.com/@lns_archviz" target="_blank" class="youtube-container">
+                            <img class="youtube-logo" src="icons/Youtube.avif"></img>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="close-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -1020 960 960" width="24px" fill="#1f1f1f"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1910,6 +2230,7 @@
         let daytrigger = document.querySelector('#daytrigger');
         let nighttrigger = document.querySelector('#nighttrigger');
         let planecontainer = document.querySelector('.plane-container');
+        let bookbtn = document.querySelector('#book-btn');
         let rotatingcontainer = document.querySelector('.rotating-container');
         let planebtn = document.querySelector('#plane-btn');
         let outercompass = document.querySelector('#outer-compass');
@@ -1918,7 +2239,10 @@
         let fsEnter = document.querySelector('.fs-enter');
         let fsExit = document.querySelector('.fs-exit');
         let smallmap = document.querySelector('#smallmap');
+        let modal = document.querySelector('.modal');
         let mapimage = document.querySelector('.mapimage');
+        let bookcontent = document.querySelector('.book-content');
+        let emailcontainer = document.querySelector('.email-container');
         let showcolors = document.querySelector('.showcolors');
         let planebtnclick = true;
         let color1 = document.querySelector('#color1');
@@ -2218,23 +2542,53 @@
         });
 
         const mapOverlay = document.getElementById('map-overlay');
-        const closeBtn = document.getElementById('close-map-btn');
+        const overlay = document.querySelector('.overlay');
+        const closeMapBtn = document.getElementById('close-map-btn');
+        const closeBtn = document.querySelector('.close-btn');
 
         // Open the overlay
         smallmap.addEventListener('click', () => {
-            mapOverlay.classList.add('active');
+            mapOverlay.classList.add('present');
+            overlay.classList.add('active');
+            modal.classList.remove('floathide');
+            bookcontent.classList.add('floathide');
         });
-      
+        bookbtn.addEventListener('click', () => {
+            mapOverlay.classList.add('present');
+            overlay.classList.add('active');
+            bookcontent.classList.remove('floathide');
+            modal.classList.add('floathide');
+        })
         // Close the overlay using the close button
+        closeMapBtn.addEventListener('click', () => {
+            mapOverlay.classList.remove('present');
+            overlay.classList.remove('active');
+            removeFloatContent();
+        });
         closeBtn.addEventListener('click', () => {
-            mapOverlay.classList.remove('active');
+            mapOverlay.classList.remove('present');
+            overlay.classList.remove('active');
+            removeFloatContent();
         });
       
         // Close the overlay when clicking on the dark background
         mapOverlay.addEventListener('click', (e) => {
             if (e.target === mapOverlay) {
-                mapOverlay.classList.remove('active');
+                mapOverlay.classList.remove('present');
+                overlay.classList.remove('active');
+                removeFloatContent();
             }
+        });
+        function removeFloatContent() {
+            setTimeout(() => {
+                modal.classList.add('floathide');
+                bookcontent.classList.add('floathide');
+            }, 350);
+        }
+
+        emailcontainer.addEventListener('click', function(e) {
+            let currentUrl = window.location.href;
+            this.href = `mailto:lnsarchviz@gmail.com?subject=Hello%20Support`;
         });
 
         const floorcontainer = document.querySelector('.floor-container');
@@ -2598,13 +2952,6 @@
         }
         let lastHeight, lastWidth;
         const observer = new ResizeObserver(([entry]) => {
-            // let newWidth = entry.contentRect.width;
-            // if (newWidth !== lastWidth) {
-            //     console.log(smallmap)
-            //     lastWidth = newWidth;
-            //     smallmap.style.width = `${newWidth * 0.1}px`;
-            //     smallmap.style.height = `${newWidth * 0.1}px`;
-            // }
             let newHeight = entry.contentRect.height;
             if (newHeight !== lastHeight) {
                 lastHeight = newHeight;
@@ -2750,59 +3097,7 @@
                         rAF_ID = null;
                     });
                 }
-                // bhk2.forEach((b2) => {
-                //     console.log('uT b2 called');
-                //     b2.style.pointerEvents = 'none';
-                // })
-                // bhk3.forEach((b3) => {
-                //     console.log('uT b3 called');
-                //     b3.style.pointerEvents = 'none';
-                // })
             }
-            // if (!isDragging) {
-            //     bhk2.forEach((b2) => {
-            //        // console.log('uT b2 1 called');
-            //         if (planecontainer.classList.contains('is-hidden-3d')) {
-            //             b2.style.pointerEvents = 'none';
-            //         }
-            //         else if (b2.parentElement.classList.contains('is-hidden-3d')) {
-            //             b2.style.pointerEvents = 'none';
-            //         }
-            //         else if (b2.classList.contains('is-hidden-3d')) {
-            //             b2.style.pointerEvents = 'none';
-            //         }
-            //         else if (!planecontainer.classList.contains('is-hidden-3d')) {
-            //             b2.style.pointerEvents = 'visible';
-            //         }
-            //         else if (!b2.parentElement.classList.contains('is-hidden-3d')) {
-            //             b2.style.pointerEvents = 'visible';
-            //         }
-            //         else if (!b2.classList.contains('is-hidden-3d')) {
-            //             b2.style.pointerEvents = 'visible';
-            //         }
-            //     })
-            //     bhk3.forEach((b3) => {
-            //         //console.log('uT b3 1 called');
-            //         if (planecontainer.classList.contains('is-hidden-3d')) {
-            //             b3.style.pointerEvents = 'none';
-            //         }
-            //         else if (b3.parentElement.classList.contains('is-hidden-3d')) {
-            //             b3.style.pointerEvents = 'none';
-            //         }
-            //         else if (b3.classList.contains('is-hidden-3d')) {
-            //             b3.style.pointerEvents = 'none';
-            //         }
-            //         else if (!planecontainer.classList.contains('is-hidden-3d')) {
-            //             b3.style.pointerEvents = 'visible';
-            //         }
-            //         else if (!b3.parentElement.classList.contains('is-hidden-3d')) {
-            //             b3.style.pointerEvents = 'visible';
-            //         }
-            //         else if (!b3.classList.contains('is-hidden-3d')) {
-            //             b3.style.pointerEvents = 'visible';
-            //         }
-            //     })
-            // }
         });
         // check it run all the time...
         container.addEventListener('mouseup', () => {
@@ -2810,20 +3105,6 @@
             container.classList.remove('is-dragging');
             img.classList.remove('tracking');
             updateTransform();
-            // if (planecontainer.classList.contains('is-hidden-3d')) return
-            // bhk2.forEach((b2) => {
-            //     console.log('uT b2 2 called');
-            //     if (b2.parentElement.classList.contains('is-hidden-3d')) return
-            //     if (b2.classList.contains('is-hidden-3d')) return
-            //     b2.style.pointerEvents = 'visible';
-            // })
-            // bhk3.forEach((b3) => {
-            //     console.log('uT b3 2 called');
-            //     if (b3.parentElement.classList.contains('is-hidden-3d')) return
-            //     if (b3.classList.contains('is-hidden-3d')) return
-            //     b3.style.pointerEvents = 'visible';
-            //     //console.log(b3, 'called')
-            // })
         });
         container.addEventListener('touchstart', (e) => {
             img.classList.add('tracking');
