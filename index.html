@@ -83,7 +83,6 @@
             transform: translate(-50%, -50%);
             z-index: 1;
             border-radius: 15px;
-            overflow: hidden;
             /* will-change: transform; */
         }
         #freeze-canvas {
@@ -97,7 +96,6 @@
             z-index: 2;
             opacity: 0;
             border-radius: 15px;
-            overflow: hidden;
             pointer-events: none;
             /* will-change: transform; */
         }
@@ -2643,13 +2641,7 @@
             const canRadius = 30;
             if (cachedImg && cachedImg.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                // ctx.save();
-                // // 2. Create a rounded rectangle path and clip it
-                // ctx.beginPath();
-                // ctx.roundRect(0, 0, canvas.width, canvas.height, canRadius);
-                // ctx.clip();
                 ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
-                // ctx.restore();
             }
 
             //console.log(newSrc);
