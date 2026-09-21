@@ -84,6 +84,7 @@
             z-index: 1;
             border-radius: 15px;
             overflow: hidden;
+            clip-path: inset(0 round 15px);
             /* will-change: transform; */
         }
         #freeze-canvas {
@@ -2643,14 +2644,11 @@
             const canRadius = 30;
             if (cachedImg && cachedImg.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
                 ctx.save();
-    
                 // 2. Create a rounded rectangle path and clip it
                 ctx.beginPath();
                 ctx.roundRect(0, 0, canvas.width, canvas.height, canRadius);
                 ctx.clip();
-
                 ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
                 ctx.restore();
             }
