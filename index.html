@@ -84,7 +84,6 @@
             z-index: 1;
             border-radius: 15px;
             overflow: hidden;
-            clip-path: inset(0 round 15px);
             /* will-change: transform; */
         }
         #freeze-canvas {
@@ -2644,13 +2643,13 @@
             const canRadius = 30;
             if (cachedImg && cachedImg.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.save();
-                // 2. Create a rounded rectangle path and clip it
-                ctx.beginPath();
-                ctx.roundRect(0, 0, canvas.width, canvas.height, canRadius);
-                ctx.clip();
+                // ctx.save();
+                // // 2. Create a rounded rectangle path and clip it
+                // ctx.beginPath();
+                // ctx.roundRect(0, 0, canvas.width, canvas.height, canRadius);
+                // ctx.clip();
                 ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
-                ctx.restore();
+                // ctx.restore();
             }
 
             //console.log(newSrc);
@@ -3028,22 +3027,20 @@
         let startDistance = 0;
         let startScale = 1;
         let zoom = 3.0;
+        let isMouseDown = false;
 
         let cachedContainerRect = null;
         let cachedImgWidth = null;
         let cachedImgHeight = null;
-
-        let lastTapTime = 0;
-        let lastTapX = 0;
-        let lastTapY = 0;
+        
         let touchStartX = 0;
         let touchStartY = 0;
-        let tapTimer = null;
-        const DOUBLE_TAP_DELAY = 300; // milliseconds
-        const SWIPE_THRESHOLD = 50; 
-        
-        let isDoubleTap = false;
+        let mouseStartX = 0;
+        let mouseStartY = 0;
 
+        const SWIPE_THRESHOLD = 50;
+        let rAF_ID = null;
+        
         function updateTransform(s) {
             console.log('update transoform called')
 
@@ -3075,7 +3072,7 @@
                 container.style.touchAction = 'auto'; // Unlock HTML page scrolling
             }
         }
-        let rAF_ID = null;
+
         container.addEventListener('wheel', (e) => {
             if (scale === 1 && e.deltaY > 0) {
                 return
@@ -3117,11 +3114,15 @@
                 startX = e.clientX - posX;
                 startY = e.clientY - posY;
                 updateTransform();
+            } else {
+                isMouseDown = true;
+                mouseStartX = e.clientX;
+                mouseStartY = e.clientY;
             }
         });
 
         container.addEventListener('mousemove', (e) => {
-            if (isDragging) {
+            if (isDragging && scale > 1) {
                 container.classList.add('is-dragging');
                 posX = e.clientX - startX;
                 posY = e.clientY - startY;
@@ -3134,11 +3135,27 @@
             }
         });
         // check it run all the time...
-        container.addEventListener('mouseup', () => {
-            isDragging = false;
-            container.classList.remove('is-dragging');
-            img.classList.remove('tracking');
-            updateTransform();
+        container.addEventListener('mouseup', (e) => {
+            if (scale > 1) {
+                isDragging = false;
+                container.classList.remove('is-dragging');
+                img.classList.remove('tracking');
+                updateTransform();
+            } else if (isMouseDown) {
+                isMouseDown = false;
+                const diffX = e.clientX - mouseStartX;
+                const diffY = e.clientY - mouseStartY;
+
+                // PC Swipe detection when fully zoomed out
+                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX > 0) {
+                        moveLeft();
+                    } else {
+                        moveRight();
+                    }
+                }
+            }
+            
         });
 
         container.addEventListener('touchstart', (e) => {
