@@ -66,6 +66,11 @@
         .container.is-dragging .bhk3 {
             pointer-events: none !important;
         }
+        /* .container.is-zooming .bhk2,
+        .container.is-zooming .bhk3 {
+            pointer-events: none !important;
+        } */
+
         #main-video {
             display: block;
             object-fit: contain;
@@ -91,8 +96,12 @@
             z-index: 2;
             opacity: 0;
             border-radius: 15px;
+            overflow: hidden;
             pointer-events: none;
             /* will-change: transform; */
+        }
+        #freeze-canvas * {
+            border-radius: 15px;
         }
         #left-btn {
             position: absolute;
@@ -3018,6 +3027,17 @@
         let cachedImgWidth = null;
         let cachedImgHeight = null;
 
+        let lastTapTime = 0;
+        let lastTapX = 0;
+        let lastTapY = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let tapTimer = null;
+        const DOUBLE_TAP_DELAY = 300; // milliseconds
+        const SWIPE_THRESHOLD = 50; 
+        
+        let isDoubleTap = false;
+
         function updateTransform(s) {
             console.log('update transoform called')
 
@@ -3114,8 +3134,15 @@
             img.classList.remove('tracking');
             updateTransform();
         });
+
         container.addEventListener('touchstart', (e) => {
             img.classList.add('tracking');
+
+            if (e.touches.length === 1) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }
+
             if (e.touches.length === 2) {
                 // Two fingers: Setup Pinch Zoom
                 e.preventDefault();
@@ -3168,14 +3195,34 @@
         }, { passive: false });
 
         container.addEventListener('touchend', (e) => {
+
+            // NEW: Detect swipe (only when fully zoomed out)
+            if (e.changedTouches.length === 1 && scale === 1 && !isDragging) {
+                const touch = e.changedTouches[0];
+                const diffX = touch.clientX - touchStartX;
+                const diffY = touch.clientY - touchStartY;
+
+                // Check if horizontal swipe (more horizontal than vertical)
+                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX > 0) {
+                        // Swiped right
+                        moveLeft();
+                    } else {
+                        // Swiped left
+                        moveRight();
+                    }
+                }
+            }
+
             if (e.touches.length < 2) startDistance = 0;
+
             if (e.touches.length === 0) {
                 isDragging = false;
                 container.classList.remove('is-dragging');
                 img.classList.remove('tracking');
             }
             updateTransform();
-        });
+        }, { passive: false });
         syncWidth();
         playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
         updateSliders();
