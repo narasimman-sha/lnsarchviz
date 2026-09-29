@@ -2042,15 +2042,19 @@
     <script>
         let allvideo = {
             day: {
-                forward: ['video/Day/f1.webm', 'video/Day/f2.webm', 'video/Day/f3.webm', 'video/Day/f4.webm'],
-                backward: ['video/Day/r1.webm', 'video/Day/r2.webm', 'video/Day/r3.webm', 'video/Day/r4.webm']
+                forward: ['https://narasimman-sha.github.io/lnsarchviz/video/Day/f1.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/f2.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/f3.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/f4.webm'],
+                backward: ['https://narasimman-sha.github.io/lnsarchviz/video/Day/r1.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/r2.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/r3.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Day/r4.webm']
             },
             night: {
-                forward: ['video/Night/f1.webm', 'video/Night/f2.webm', 'video/Night/f3.webm', 'video/Night/f4.webm'],
-                backward: ['video/Night/r1.webm', 'video/Night/r2.webm', 'video/Night/r3.webm', 'video/Night/r4.webm']
+                forward: ['https://narasimman-sha.github.io/lnsarchviz/video/Night/f1.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/f2.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/f3.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/f4.webm'],
+                backward: ['https://narasimman-sha.github.io/lnsarchviz/video/Night/r1.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/r2.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/r3.webm', 'https://narasimman-sha.github.io/lnsarchviz/video/Night/r4.webm']
             }
             
         };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initBackgroundPreloader();
+        });
         
         let alldetails = [
             {
@@ -2626,7 +2630,7 @@
             });
         }
         preloadFirstFrames();
-        function playWithCanvasBuffer(newSrc, p, currentRotation) {
+        async function playWithCanvasBuffer(newSrc, p, currentRotation) {
             console.log(newSrc, p, currentRotation)
             console.log('playcanvas called');
 
@@ -2644,9 +2648,11 @@
                 ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
             }
 
+            let optimizedSrc = await prioritizeAndLoad(newSrc);
+
             //console.log(newSrc);
             mainvideo.src = "";
-            mainvideo.src = newSrc;
+            mainvideo.src = optimizedSrc;
             mainvideo.load();
             //console.log(p)
             if(p === 'play') {
@@ -3238,6 +3244,100 @@
             }
             updateTransform();
         }, { passive: false });
+
+
+        const videoCache = new Map(); // Stores object URLs for instant playback
+        const downloadQueue = [];
+        let activeController = null;
+        let currentPriorityUrl = null;
+
+        function initBackgroundPreloader() {
+            for (const timeKey in allvideo) {
+                for (const dirKey in allvideo[timeKey]) {
+                    allvideo[timeKey][dirKey].forEach(url => {
+                        console.log(url);
+                        if (!downloadQueue.includes(url) && !videoCache.has(url)) {
+                            downloadQueue.push(url);
+                        }
+                    });
+                }
+            }
+            processQueue();
+        }
+        async function processQueue() {
+            if (downloadQueue.length === 0 || activeController) return;
+        
+            const url = downloadQueue.shift(); // Takes the video off the queue
+            if (videoCache.has(url)) {
+                processQueue(); // Skip if already downloaded
+                return;
+            }
+        
+            activeController = new AbortController();
+        
+            try {
+                const response = await fetch(url, { signal: activeController.signal });
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+                videoCache.set(url, objectUrl);
+                console.log(`[Preloader] Downloaded in background: ${url}`);
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log(`[Preloader] Paused download for: ${url}`);
+                    
+                    // FIX: Put the paused video back at the front of the queue 
+                    // so it doesn't get skipped when the queue resumes!
+                    if (!downloadQueue.includes(url)) {
+                        downloadQueue.unshift(url);
+                    }
+                } else {
+                    console.error(`[Preloader] Failed to download ${url}:`, error);
+                }
+            } finally {
+                activeController = null;
+                // Continue queue if not currently prioritizing a user request
+                if (!currentPriorityUrl) {
+                    processQueue();
+                }
+            }
+        }
+        async function prioritizeAndLoad(url) {
+            currentPriorityUrl = url;
+        
+            // If already cached, return immediately
+            if (videoCache.has(url)) {
+                return videoCache.get(url);
+            }
+        
+            // If something else is downloading, abort it immediately to free bandwidth
+            if (activeController) {
+                activeController.abort();
+                activeController = null;
+            }
+        
+            // Put the requested video at the absolute front of the queue
+            const index = downloadQueue.indexOf(url);
+            if (index > -1) downloadQueue.splice(index, 1);
+        
+            console.log(`[Priority] Fast-tracking download for: ${url}`);
+
+            try {
+                const controller = new AbortController();
+                const response = await fetch(url, { signal: controller.signal });
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+                videoCache.set(url, objectUrl);
+                return objectUrl;
+            } catch (error) {
+                console.error(`[Priority] Error loading high-priority video:`, error);
+                return url; // Fallback to raw URL if fetch fails
+            } finally {
+                currentPriorityUrl = null;
+                processQueue(); // Resume background queue
+            }
+        }
+
+
         syncWidth();
         playWithCanvasBuffer(allvideo['day'].forward[0], 'pause', currentRotation = 0);
         updateSliders();
