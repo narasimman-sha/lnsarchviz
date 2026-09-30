@@ -2269,19 +2269,27 @@
             canvasEl.classList.add('scene-blur');
             outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
             innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
-            Promise.all([prioritizeAndLoadBlob(outerurl), prioritizeAndLoadBlob(innerurl)]).then(() => {
-                innerDomeTexture(innerurl);
-                outerDomeTexture(outerurl);
-                
-                // Remove blur after textures applied
+
+            activePriorityLoads++; 
+
+            try {
+                await innerDomeTexture(innerurl);
+                await outerDomeTexture(outerurl);
+            
+                // Remove blur after both textures are applied
                 setTimeout(() => {
                     canvasEl.classList.remove('scene-blur');
                 }, 300);
-            })
-            .catch(err => {
+            
+            } catch (err) {
                 console.error("Failed to load textures:", err);
                 canvasEl.classList.remove('scene-blur');
-            });
+            } finally {
+                activePriorityLoads--; // Release lock when transition finishes
+                if (activePriorityLoads === 0) {
+                    processImageQueue();
+                }
+            }
         });
         nighttrigger.addEventListener('click', async () => {
             if(currenttime == 'night') return
@@ -2291,29 +2299,28 @@
             canvasEl.classList.add('scene-blur');
             outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
             innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
-            Promise.all([prioritizeAndLoadBlob(outerurl), prioritizeAndLoadBlob(innerurl)]).then(() => {
-                innerDomeTexture(innerurl);
-                outerDomeTexture(outerurl);
 
-                // Remove blur after textures applied
+            activePriorityLoads++;
+
+            try {
+                await innerDomeTexture(innerurl);
+                await outerDomeTexture(outerurl);
+
+                // Remove blur after both textures are applied
                 setTimeout(() => {
                     canvasEl.classList.remove('scene-blur');
                 }, 300);
-            })
-            .catch(err => {
+            
+            } catch (err) {
                 console.error("Failed to load textures:", err);
                 canvasEl.classList.remove('scene-blur');
-            });
+            } finally {
+                activePriorityLoads--; // Release lock when transition finishes
+                if (activePriorityLoads === 0) {
+                    processImageQueue();
+                }
+            }
         });
-        // function preloadImage(url) {
-        //     return new Promise((resolve, reject) => {
-        //         const img = new Image();
-        //         img.crossOrigin = 'anonymous';
-        //         img.onload = () => resolve(url);
-        //         img.onerror = () => reject(new Error(`Failed to load ${url}`));
-        //         img.src = url;
-        //     });
-        // }
 
         // Function to enter full screen
         function enterFullScreen() {
@@ -2751,14 +2758,13 @@
         const blobCache = new Map();
         const imageDownloadQueue = [];
         let activeImageController = null;
-        let currentImagePriorityUrl = null;
+        let activePriorityLoads = 0;
 
         function initImageBackgroundPreloader() {
             // Loop through inner dome
             for (const bhkKey in allImages.innerDome) {
                 for (const timeKey in allImages.innerDome[bhkKey]) {
                     allImages.innerDome[bhkKey][timeKey].forEach(url => {
-                        console.log(url);
                         if (!imageDownloadQueue.includes(url) && !blobCache.has(url)) {
                             imageDownloadQueue.push(url);
                         }
@@ -2768,7 +2774,6 @@
             // Loop through outer dome
             for (const timeKey in allImages.outerDome) {
                 allImages.outerDome[timeKey].forEach(url => {
-                    console.log(url);
                     if (!imageDownloadQueue.includes(url) && !blobCache.has(url)) {
                         imageDownloadQueue.push(url);
                     }
@@ -2777,16 +2782,17 @@
             processImageQueue();
         }
         async function processImageQueue() {
-            if (imageDownloadQueue.length === 0 || activeImageController) return;
+            // Do not process background queue if any priority load is active
+            if (imageDownloadQueue.length === 0 || activeImageController || activePriorityLoads > 0) return;
 
             const url = imageDownloadQueue.shift();
             if (blobCache.has(url)) {
                 processImageQueue();
                 return;
             }
-
+        
             activeImageController = new AbortController();
-
+        
             try {
                 const response = await fetch(url, { signal: activeImageController.signal });
                 const blob = await response.blob();
@@ -2803,20 +2809,20 @@
                 }
             } finally {
                 activeImageController = null;
-                if (!currentImagePriorityUrl) {
+                if (activePriorityLoads === 0) {
                     processImageQueue();
                 }
             }
         }
 
         async function prioritizeAndLoadBlob(url) {
-            console.log('priorty download called')
-            currentImagePriorityUrl = url;
-            console.log(currentImagePriorityUrl)
+            console.log('priority download called');
+            activePriorityLoads++; // Increment lock counter
         
             let blob = blobCache.get(url);
         
             if (!blob) {
+                // Abort any active background preloader download immediately
                 if (activeImageController) {
                     activeImageController.abort();
                     activeImageController = null;
@@ -2839,8 +2845,12 @@
                 }
             }
         
-            currentImagePriorityUrl = null;
-            processImageQueue(); // Resume background queue
+            activePriorityLoads--; // Decrement lock counter
+        
+            // Only resume background queue when ALL priority requests are fully finished
+            if (activePriorityLoads === 0) {
+                processImageQueue(); 
+            }
         
             return blob;
         }
