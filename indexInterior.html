@@ -2006,6 +2006,19 @@
         let targetFlatId = urlParams.get('id');
         let foundFlat = null;
 
+        let allImages = {
+            outerDome: {
+                day: ['https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level1.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level2.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level3.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level4.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level5.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level6.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level7.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level8.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level9.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/day/Level10.avif'],
+                night: ['https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level1.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level2.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level3.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level4.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level5.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level6.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level7.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level8.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level9.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/night/Level10.avif']
+            },
+            innerDome: {
+                'bhk3': {
+                    day: ['https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/LR1A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/LR2A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/BALCONYA5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/KITCHENA5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/BR1A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/BR2A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/BR3A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/BTH1A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/BTH2A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/BTH3A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/day/STOREROOM5K.avif'],
+                    night: ['https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/LR1A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/LR2A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/BALCONYA5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/KITCHENA5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/BR1A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/BR2A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/BR3A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/BTH1A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/BTH2A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/BTH3A5K.avif', 'https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/bhk3/night/STOREROOM5K.avif']
+                }  
+            }
+        };
+
         let alldetails = [
             {
                 floor: 'Floor 1',
@@ -2256,7 +2269,7 @@
             canvasEl.classList.add('scene-blur');
             outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
             innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
-            Promise.all([preloadImage(outerurl), preloadImage(innerurl)]).then(() => {
+            Promise.all([prioritizeAndLoadBlob(outerurl), prioritizeAndLoadBlob(innerurl)]).then(() => {
                 innerDomeTexture(innerurl);
                 outerDomeTexture(outerurl);
                 
@@ -2278,7 +2291,7 @@
             canvasEl.classList.add('scene-blur');
             outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
             innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
-            Promise.all([preloadImage(outerurl), preloadImage(innerurl)]).then(() => {
+            Promise.all([prioritizeAndLoadBlob(outerurl), prioritizeAndLoadBlob(innerurl)]).then(() => {
                 innerDomeTexture(innerurl);
                 outerDomeTexture(outerurl);
 
@@ -2292,15 +2305,15 @@
                 canvasEl.classList.remove('scene-blur');
             });
         });
-        function preloadImage(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => resolve(url);
-                img.onerror = () => reject(new Error(`Failed to load ${url}`));
-                img.src = url;
-            });
-        }
+        // function preloadImage(url) {
+        //     return new Promise((resolve, reject) => {
+        //         const img = new Image();
+        //         img.crossOrigin = 'anonymous';
+        //         img.onload = () => resolve(url);
+        //         img.onerror = () => reject(new Error(`Failed to load ${url}`));
+        //         img.src = url;
+        //     });
+        // }
 
         // Function to enter full screen
         function enterFullScreen() {
@@ -2538,6 +2551,7 @@
             actualCam = entitiyCam.getObject3D('camera');
 
             cameraEl = document.querySelector('[camera]');
+            initImageBackgroundPreloader();
             if (!cameraEl) {
                 console.error("Camera element not found");
                 return;
@@ -2606,14 +2620,17 @@
                 })
             });
         }
+        
+        let currentOuterBitmap = null;
+        let currentInnerBitmap = null;
+
         async function outerDomeTexture(url) {
             //outerdome.setAttribute('material', 'src', outerurl);
             let mesh = outerdome.getObject3D('mesh');
             if (!mesh) return;
             try {
                 // Fetch and decode asynchronously inside the texture function
-                let response = await fetch(url);
-                let blob = await response.blob();
+                let blob = await prioritizeAndLoadBlob(url);
                 let imageBitmap = await createImageBitmap(blob, { imageOrientation: 'flipY' });
 
                 let material = mesh.material;
@@ -2622,6 +2639,10 @@
                 if (material.map) {
                     material.map.dispose();
                 }
+                if (currentOuterBitmap) {
+                    currentOuterBitmap.close();
+                }
+                currentOuterBitmap = imageBitmap;
 
                 // Create Three.js texture from the decoded bitmap
                 let texture = new THREE.CanvasTexture(imageBitmap);
@@ -2649,8 +2670,7 @@
             if (!mesh) return;
             try {
                 // Fetch and decode asynchronously inside the texture function
-                let response = await fetch(url);
-                let blob = await response.blob();
+                let blob = await prioritizeAndLoadBlob(url);
                 let imageBitmap = await createImageBitmap(blob, { imageOrientation: 'flipY' });
 
                 let material = mesh.material;
@@ -2659,6 +2679,10 @@
                 if (material.map) {
                     material.map.dispose();
                 }
+                if (currentInnerBitmap) {
+                    currentInnerBitmap.close();
+                }
+                currentInnerBitmap = imageBitmap;
 
                 // Create Three.js texture from the decoded bitmap
                 let texture = new THREE.CanvasTexture(imageBitmap);
@@ -2722,7 +2746,105 @@
             });
             previousPosition = currentposistion;
         }
+
+
+        const blobCache = new Map();
+        const imageDownloadQueue = [];
+        let activeImageController = null;
+        let currentImagePriorityUrl = null;
+
+        function initImageBackgroundPreloader() {
+            // Loop through inner dome
+            for (const bhkKey in allImages.innerDome) {
+                for (const timeKey in allImages.innerDome[bhkKey]) {
+                    allImages.innerDome[bhkKey][timeKey].forEach(url => {
+                        console.log(url);
+                        if (!imageDownloadQueue.includes(url) && !blobCache.has(url)) {
+                            imageDownloadQueue.push(url);
+                        }
+                    });
+                }
+            }
+            // Loop through outer dome
+            for (const timeKey in allImages.outerDome) {
+                allImages.outerDome[timeKey].forEach(url => {
+                    console.log(url);
+                    if (!imageDownloadQueue.includes(url) && !blobCache.has(url)) {
+                        imageDownloadQueue.push(url);
+                    }
+                });
+            }
+            processImageQueue();
+        }
+        async function processImageQueue() {
+            if (imageDownloadQueue.length === 0 || activeImageController) return;
+
+            const url = imageDownloadQueue.shift();
+            if (blobCache.has(url)) {
+                processImageQueue();
+                return;
+            }
+
+            activeImageController = new AbortController();
+
+            try {
+                const response = await fetch(url, { signal: activeImageController.signal });
+                const blob = await response.blob();
+                blobCache.set(url, blob);
+                console.log(`[Background Preloader] Downloaded raw blob: ${url}`);
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log(`[Background Preloader] Paused download for: ${url}`);
+                    if (!imageDownloadQueue.includes(url)) {
+                        imageDownloadQueue.unshift(url); // Put back to front of queue
+                    }
+                } else {
+                    console.error(`[Background Preloader] Failed to load ${url}:`, error);
+                }
+            } finally {
+                activeImageController = null;
+                if (!currentImagePriorityUrl) {
+                    processImageQueue();
+                }
+            }
+        }
+
+        async function prioritizeAndLoadBlob(url) {
+            console.log('priorty download called')
+            currentImagePriorityUrl = url;
+            console.log(currentImagePriorityUrl)
         
+            let blob = blobCache.get(url);
+        
+            if (!blob) {
+                if (activeImageController) {
+                    activeImageController.abort();
+                    activeImageController = null;
+                }
+            
+                const index = imageDownloadQueue.indexOf(url);
+                if (index > -1) imageDownloadQueue.splice(index, 1);
+            
+                console.log(`[Priority] Fast-tracking download for: ${url}`);
+            
+                try {
+                    const controller = new AbortController();
+                    const response = await fetch(url, { signal: controller.signal });
+                    blob = await response.blob();
+                    blobCache.set(url, blob);
+                } catch (error) {
+                    console.error(`[Priority] Error loading high-priority blob:`, error);
+                    const res = await fetch(url);
+                    blob = await res.blob();
+                }
+            }
+        
+            currentImagePriorityUrl = null;
+            processImageQueue(); // Resume background queue
+        
+            return blob;
+        }
+
     </script>
     <script>
         AFRAME.registerComponent('hotspot-behavior', {
