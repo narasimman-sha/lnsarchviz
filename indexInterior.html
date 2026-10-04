@@ -1073,7 +1073,7 @@
                                 <div class="email-heading">Email</div>
                                 <div class="email-address">lnsarchviz@gmail.com</div>
                             </a>
-                            <a href="https://wa.me/lnsarchviz" target="_blank" class="whatsapp-container">
+                            <a href="" target="_blank" class="whatsapp-container">
                                 <img class="whatsapp-logo" src="icons/Whatsapp.avif"></img>
                                 <div class="whatsapp-heading">Whatsapp</div>
                                 <div class="whatsapp-address">@lnsarchviz</div>
@@ -2231,11 +2231,13 @@
         let fsContainer = document.querySelector('.full-screen');
         let fsEnter = document.querySelector('.fs-enter');
         let fsExit = document.querySelector('.fs-exit');
+        let sharecontent = document.querySelector('.share-content');
         let floatingui = document.querySelector('#floating-ui');
         let floatcontent = document.querySelector('.float-content');
         let plancontent = document.querySelector('.plan-content');
         let bookcontent = document.querySelector('.book-content');
         let emailcontainer = document.querySelector('.email-container');
+        let whatsappcontainer = document.querySelector('.whatsapp-container');
         let closebtn = document.querySelectorAll('.close-btn');
         let planimage =  document.querySelector('#plan-image');
         let planhotpoints = document.querySelectorAll('.plan-hotpoints > div');
@@ -2358,6 +2360,33 @@
             }
         });
 
+        sharecontent.addEventListener('click', async () => {
+            let currentSide = side.options[side.selectedIndex].dataset.side;
+            let currentLevel = levelselection.value;
+            const shareData = {
+                title: document.title,
+                text: `Welcome to Interactive Apartment, Flat No: ${foundFlat.name}, Presenet Floor ${currentLevel} and Facing ${currentSide}`,
+                url: window.location.href
+            };
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                    console.log('Page shared successfully');
+                } catch (err) {
+                    // This catches errors, such as the user canceling the share menu
+                    console.error('Error sharing:', err);
+                }
+            } else {
+                // 3. Fallback for older PC browsers (Copies link to clipboard instead)
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert('Link copied to clipboard! You can now paste it anywhere.');
+                } catch (err) {
+                    alert('Please copy the URL from your browser address bar to share.');
+                }
+            }
+        });
+
         floorplan.addEventListener('click', function () {
             floatingui.classList.add('present');
             floatcontent.classList.add('contentpresent');
@@ -2415,7 +2444,12 @@
             let currentLevel = levelselection.value;
             this.href = `mailto:lnsarchviz@gmail.com?subject=Hello%20Support&body=Flat No: ${foundFlat.name},%0AFacing: ${currentSide},%0AFloor: ${currentLevel}%0A`;
         });
-
+        whatsappcontainer.addEventListener('click', function(e) {
+            let currentUrl = window.location.href;
+            let currentSide = side.options[side.selectedIndex].dataset.side;
+            let currentLevel = levelselection.value;
+            this.href = `https://wa.me/918220369396?text=Looking%20Flat%20No:%20${foundFlat.name},%20Facing:%20${currentSide},%20Floor:%20${currentLevel}`;
+        });
         levelselection.addEventListener('change', function() {
             level = levelselection.value;
             outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
