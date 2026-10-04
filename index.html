@@ -2255,6 +2255,7 @@
         let fsContainer = document.querySelector('.full-screen');
         let fsEnter = document.querySelector('.fs-enter');
         let fsExit = document.querySelector('.fs-exit');
+        let sharecontent = document.querySelector('.share-content');
         let smallmap = document.querySelector('#smallmap');
         let modal = document.querySelector('.modal');
         let mapimage = document.querySelector('.mapimage');
@@ -2558,6 +2559,30 @@
             }
         });
 
+        sharecontent.addEventListener('click', async () => {
+            const shareData = {
+                title: document.title,
+                text: 'Welcome to Interactive Apartment',
+                url: window.location.href
+            };
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                    console.log('Page shared successfully');
+                } catch (err) {
+                    // This catches errors, such as the user canceling the share menu
+                    console.error('Error sharing:', err);
+                }
+            } else {
+                // 3. Fallback for older PC browsers (Copies link to clipboard instead)
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert('Link copied to clipboard! You can now paste it anywhere.');
+                } catch (err) {
+                    alert('Please copy the URL from your browser address bar to share.');
+                }
+            }
+        });
         const mapOverlay = document.getElementById('map-overlay');
         const overlay = document.querySelector('.overlay');
         const closeMapBtn = document.getElementById('close-map-btn');
