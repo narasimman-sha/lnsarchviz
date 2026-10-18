@@ -2677,14 +2677,11 @@
             let optimizedSrc = await prioritizeAndLoad(newSrc);
 
             //console.log(newSrc);
-            mainvideo.pause();
             mainvideo.removeAttribute('src');
-            mainvideo.load();
-
             mainvideo.src = optimizedSrc;
             mainvideo.load();
 
-            //console.log(p)
+            console.log(p)
             if(p === 'play') {
                 const handleVideoReady = async () => {
                     mainvideo.removeEventListener('loadeddata', handleVideoReady);
@@ -2693,15 +2690,17 @@
                 
                         if ('requestVideoFrameCallback' in mainvideo) {
                             mainvideo.requestVideoFrameCallback(() => {
-                                setTimeout(() => {
-                                    finalizeTransition(currentRotation);
-                                }, 80);
+                                finalizeTransition(currentRotation);
                             });
                         }
                         else {
-                            setTimeout(() => {
+                            mainvideo.play().then(() => {
+                                // updateRotationsSmoothly(currentRotation);
+                                // setTimeout(() => {
+                                //     canvas.style.opacity = 0;
+                                // }, 50)
                                 finalizeTransition(currentRotation);
-                            }, 180);
+                            })
                         }
                     } catch (err) {
                         console.error("Autoplay prevented or error:", err);
