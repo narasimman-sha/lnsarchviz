@@ -2672,76 +2672,55 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
             }
+            canvas.style.opacity = 1;
 
             let optimizedSrc = await prioritizeAndLoad(newSrc);
 
             //console.log(newSrc);
-            mainvideo.src = "";
+            mainvideo.pause();
+            mainvideo.removeAttribute('src');
+            mainvideo.load();
             mainvideo.src = optimizedSrc;
             mainvideo.load();
+
             //console.log(p)
             if(p === 'play') {
-                canvas.style.opacity = 1;
-                mainvideo.onloadeddata = () => {
+                const handleVideoReady = async () => {
+                    mainvideo.removeEventListener('loadeddata', handleVideoReady);
+                    try {
+                        await mainvideo.play();
                 
-                if ('requestVideoFrameCallback' in mainvideo) {
-                mainvideo.requestVideoFrameCallback(() => {
-                    // This runs EXACTLY when the first new frame renders!
-                    console.log("First frame officially rendered:", mainvideo.currentTime);
-                    outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
-                    
-                    updateRotationsSmoothly(currentRotation);
-                    // floor.forEach(f => {
-                    //     f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
-                    // });
-                    canvas.style.opacity = 0;
-                    });
-                }
-                else {
-                    mainvideo.play().then(() => {
-                        console.log(mainvideo.currentTime);
-
-                        updateRotationsSmoothly(currentRotation);
-                        // floor.forEach(f => {
-                        //     //console.log(f)
-                        //     f.style.transform = `rotate3d(0, 1, 0, ${currentRotation}deg)`;
-                        // })
-                    
-                        // 6. Once the new video is actually playing, hide the canvas
-                        setTimeout(() => {
-                            canvas.style.opacity = 0;
-                        }, 50)
-                    })
-                }
-                mainvideo.play().catch(err => {
-                    console.error("Autoplay prevented or error:", err);
-                });
-
-                    // Clear the listener
-                    mainvideo.onloadeddata = null;
-                };
-            }
-            if (p === 'pause') {
-                canvas.style.opacity = 1;
-                if ('requestVideoFrameCallback' in mainvideo) {
-                    mainvideo.requestVideoFrameCallback(() => {
-                        mainvideo.currentTime = 0;
-                        console.log(mainvideo.currentTime);
+                        if ('requestVideoFrameCallback' in mainvideo) {
+                        mainvideo.requestVideoFrameCallback(() => {
+                            finalizeTransition(currentRotation);
+                            });
+                        }
+                        else {
+                            setTimeout(() => {
+                                finalizeTransition(currentRotation);
+                            }, 150);
+                        }
+                    } catch (err) {
+                        console.error("Autoplay prevented or error:", err);
                         canvas.style.opacity = 0;
-                    // 6. Once the new video is actually playing, hide the canvas
-                    // for mobile no animation is done check duration and increase further
-                    // canvas.animate(
-                    //     [{ opacity: 1 }, { opacity: 0 }],
-                    //     { duration: 5000, easing: 'ease' }
-                    //     ).onfinish = () => {
-                    //     canvas.style.opacity = 1;
-                    // };
-                    // Clear the listener
-                    // mainvideo.onloadeddata = null;
-                    })
+                    }
                 };
+                mainvideo.addEventListener('loadeddata', handleVideoReady);
             }
-            
+            else if (p === 'pause') {
+                mainvideo.currentTime = 0;
+                setTimeout(() => {
+                    canvas.style.opacity = 0;
+                }, 100);
+            }
+        }
+        function finalizeTransition(currentRotation) {
+            console.log("First frame officially rendered:", mainvideo.currentTime);
+            outercompass.style.transform = `translate(-50%, -50%) rotateZ(${currentRotation}deg)`;
+            updateRotationsSmoothly(currentRotation);
+    
+            // Hide the snapshot canvas, revealing the smooth playing video underneath
+            canvas.style.opacity = 0;
         }
 
         let ticking = false;
