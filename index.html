@@ -2639,22 +2639,38 @@
             day: [],
             night: []
         };
+
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        const format = isIOS ? 'jpg' : 'avif';
+
         let totalBytes = 0;
         const framePaths = {
-            day: ['images/buffer/Day/f1.avif', 'images/buffer/Day/f2.avif', 'images/buffer/Day/f3.avif', 'images/buffer/Day/f4.avif'],
-            night: ['images/buffer/Night/f1.avif', 'images/buffer/Night/f2.avif', 'images/buffer/Night/f3.avif', 'images/buffer/Night/f4.avif']
+            day: [`images/buffer/Day/f1.${format}`, `images/buffer/Day/f2.${format}`, `images/buffer/Day/f3.${format}`, `images/buffer/Day/f4.${format}`],
+            night: [`images/buffer/Night/f1.${format}`, `images/buffer/Night/f2.${format}`, `images/buffer/Night/f3.${format}`, `images/buffer/Night/f4.${format}`]
         };
 
         function preloadFirstFrames() {
+            const loadPromises = [];
+
             ['day', 'night'].forEach(timingKey => {
                 framePaths[timingKey].forEach((src, index) => {
-                    const img = new Image();
-                    img.src = src;
-                    firstFrameImages[timingKey][index] = img;
+                    const promise = new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = () => resolve(img);
+                        img.onerror = () => reject(new Error(`Failed to load ${src}`));
+                        img.src = src;
+                        firstFrameImages[timingKey][index] = img;
+                    });
+                    loadPromises.push(promise);
                 });
             });
+
+            return Promise.all(loadPromises);
         }
-        preloadFirstFrames();
+
+        // Call it properly:
+        preloadFirstFrames().catch(err => console.error('Preload error:', err));
+
         async function playWithCanvasBuffer(newSrc, p, currentRotation) {
             console.log(newSrc, p, currentRotation)
             console.log('playcanvas called');
@@ -2670,7 +2686,9 @@
             const canRadius = 30;
             if (cachedImg && cachedImg.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
+                requestAnimationFrame(() => {
+                    ctx.drawImage(cachedImg, 0, 0, canvas.width, canvas.height);
+                });
             }
             canvas.style.opacity = 1;
 
