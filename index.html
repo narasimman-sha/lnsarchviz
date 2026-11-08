@@ -1367,7 +1367,7 @@
             border-bottom: 2px solid rgba(255, 255, 255, 0.4);
         }
         #selection-btn {
-            flex: 1 1 60%;
+            flex: 1 1 100%;
             display: flex;
             flex-flow: row nowrap;
             justify-content: flex-start;
@@ -1468,6 +1468,7 @@
         #filter-container > div > button {
             font-size: 1.1em;
             font-weight: 600;
+            flex: 1 1 25%;
             /* display: inline-block; */
             width: auto;
             padding: 5px;
@@ -1715,9 +1716,11 @@
             
             #filter-container {
                 flex-flow: column;
+                margin: 12px 7px 0px 7px;
             }
             #selection-btn {
-                flex-flow: row wrap;
+                flex-flow: row nowrap;
+                width: 100%;
             }
             #selection-btn svg {
                 width: 18px;
