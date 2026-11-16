@@ -2950,7 +2950,7 @@
                                             <p>₹ <span>${checkP(af.price)}</span> Cr</p>
                                         </div>
                                         <div class="seg4">
-                                            <button onclick="window.open('indexInterior.html?id=${af.id}', '_blank')">View Interior</button>
+                                            <button onclick="checkBHK('${af.bhk}', '${af.id}')">View Interior</button>
                                         </div>
                                 </div>`
                             ullist.append(lilist);
@@ -2999,6 +2999,15 @@
             if (!Number.isFinite(n)) return null;
 
             return parseFloat((n / 10_000_000).toFixed(decimals));
+        }
+        function checkBHK(bhk, fid) {
+            console.log(bhk, fid);
+            if (bhk == '3BHK') {
+                window.open(`indexInterior.html?id=${fid}`, '_blank');
+            }
+            else if (bhk == '2BHK') {
+                window.open(`index2Interior.html?id=${fid}`, '_blank');
+            }
         }
         let sf = document.querySelector('.singlefloor');
         sf.open = true;
