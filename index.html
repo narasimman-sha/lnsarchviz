@@ -3490,18 +3490,6 @@
             script.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-TG87XHQW';
             document.head.appendChild(script);
         }, 5000)
-        setTimeout(function() {
-            var aframeScript = document.createElement("script");
-            aframeScript.async = true;
-            aframeScript.src = 'https://aframe.io/releases/1.7.1/aframe.min.js';
-            aframeScript.onload = function() {
-                var orbitScript = document.createElement("script");
-                orbitScript.async = true;
-                orbitScript.src = 'https://cdn.jsdelivr.net/npm/aframe-orbit-controls@1.3.2/dist/aframe-orbit-controls.min.js';
-                document.head.appendChild(orbitScript);
-            }
-            document.head.appendChild(aframeScript);
-        }, 10000)
     </script>
 
 </body>
