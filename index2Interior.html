@@ -55,6 +55,47 @@
             display: block;
             width: 100%;
         }
+        #exterior {
+            display: none;
+            position: absolute;
+            top: 5px;
+            left: 12px;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+        }
+        #exterior-container {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        #exterior-container:hover .etext {
+            background-color: #f4f4f4;
+            border-radius: 15px;
+        }
+        .elogo {
+            height: 25px;
+            aspect-ratio: 1 / 1;
+            background-image: url('icons/leftside.webp');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .etext {
+            padding: 4px 12px 4px 8px;
+            color: #525252;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: 0.35s;
+            border-radius: 5px;
+        }
         #timetrigger {
             position: absolute;
             top: 5px;
@@ -897,6 +938,17 @@
         }
         
         @media screen and (max-width: 900px) {
+            #exterior {
+                top: 12px;
+                padding: 2px;
+            }
+            .elogo {
+                height: 20px;
+            }
+            .etext {
+                font-size: 1.1em;
+                padding: 2px 8px 2px 6px;
+            }
             #timetrigger {
                 top: 10px;
                 width: 160px;
@@ -934,6 +986,14 @@
             }
         }
         @media screen and (max-width: 600px) {
+            #exterior {
+                top: 12px;
+                left: 5px;
+                padding: 2px;
+            }
+            .etext {
+                padding: 2px 6px 2px 4px;
+            }
             .levelselection {
                 padding: 8px 0px 8px 8px;
             }
@@ -956,6 +1016,12 @@
 <body>
 <div id="tour-container">
     <div class="ui-container">
+        <a id="exterior" href="https://narasimman-sha.github.io/lnsarchviz/" target="_blank">
+            <div id="exterior-container">
+                <div class="elogo"></div>
+                <div class="etext">Exterior</div>
+            </div>
+        </a>
         <div id="timetrigger">
             <button id="daytrigger" class="tactive">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M440-760v-160h80v160h-80Zm266 110-55-55 112-115 56 57-113 113Zm54 210v-80h160v80H760ZM440-40v-160h80v160h-80ZM254-652 140-763l57-56 113 113-56 54Zm508 512L651-255l54-54 114 110-57 59ZM40-440v-80h160v80H40Zm157 300-56-57 112-112 29 27 29 28-114 114Zm113-170q-70-70-70-170t70-170q70-70 170-70t170 70q70 70 70 170t-70 170q-70 70-170 70t-170-70Zm283-57q47-47 47-113t-47-113q-47-47-113-47t-113 47q-47 47-47 113t47 113q47 47 113 47t113-47ZM480-480Z"/></svg>
@@ -2222,6 +2288,7 @@
         let bth2go = document.querySelectorAll('.bth2go');
         let bth3go = document.querySelectorAll('.bth3go');
         //console.log(lr1go, lr2go, br1go, br2go, br3go, kitchengo, balconygo, storeroomgo, bth1go, bth2go, bth3go)
+        let exterior = document.querySelector('#exterior');
         let daytrigger = document.querySelector('#daytrigger');
         let nighttrigger = document.querySelector('#nighttrigger');
         let floorplan = document.querySelector('.floor-plan');
@@ -2251,7 +2318,10 @@
             dynamiclevel = levelselection.querySelector(`option[data-floor="${foundFlat.floor}"]`);
             dynamicside = side.querySelector(`option[data-side="${foundFlat.facing}"]`);
         };
-        
+        if (!foundFlat) {
+            exterior.style.display = 'block';
+        }
+
         levelselection.value = dynamiclevel?.value || '1';
         let level = levelselection.value;
 
