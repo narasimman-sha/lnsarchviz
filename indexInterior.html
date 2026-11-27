@@ -2730,9 +2730,7 @@
 
                 if (targetLabel && !targetView) {
                     targetView = targetLabel.closest('.view');
-                    if (typeof gtag === 'function') {
-                        gtag('event', 'hotspot_changed');
-                    }
+                    
                 }
                 
                 //console.log(targetView);
@@ -2742,6 +2740,9 @@
                 //console.log(currentposistion);
                 if (!currentposistion) return;
 
+                if (typeof gtag === 'function') {
+                    gtag('event', 'hotspot_changed');
+                }
 
                 innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
                 // let sceneEl = document.querySelector('a-scene');

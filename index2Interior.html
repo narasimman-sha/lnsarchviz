@@ -1016,7 +1016,7 @@
 <body>
 <div id="tour-container">
     <div class="ui-container">
-        <a id="exterior" href="https://narasimman-sha.github.io/lnsarchviz/" target="_blank">
+        <a id="exterior" href="https://narasimman-sha.github.io/lnsarchviz/" target="_blank" onclick="gtag('event', 'exterior_click')">
             <div id="exterior-container">
                 <div class="elogo"></div>
                 <div class="etext">Exterior</div>
@@ -2340,6 +2340,9 @@
         daytrigger.addEventListener('click', async () => {
             if(currenttime == 'day') return
             currenttime = 'day';
+            if (typeof gtag === 'function') {
+                gtag('event', 'toggle_i_day');
+            }
             daytrigger.classList.add('tactive');
             nighttrigger.classList.remove('tactive');
             canvasEl.classList.add('scene-blur');
@@ -2370,6 +2373,9 @@
         nighttrigger.addEventListener('click', async () => {
             if(currenttime == 'night') return
             currenttime = 'night';
+            if (typeof gtag === 'function') {
+                gtag('event', 'toggle_i_night');
+            }
             daytrigger.classList.remove('tactive');
             nighttrigger.classList.add('tactive');
             canvasEl.classList.add('scene-blur');
@@ -2400,6 +2406,9 @@
 
         // Function to enter full screen
         function enterFullScreen() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'enter_i_fs');
+            }
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
@@ -2412,6 +2421,9 @@
 
         // Function to exit full screen
         function exitFullScreen() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'exit_i_fs');
+            }
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.webkitExitFullscreen) {
@@ -2435,6 +2447,9 @@
         });
 
         sharecontent.addEventListener('click', async () => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'clikc_i_sharebtn');
+            }
             let currentSide = side.options[side.selectedIndex].dataset.side;
             let currentLevel = levelselection.value;
             const shareData = {
@@ -2462,6 +2477,9 @@
         });
 
         floorplan.addEventListener('click', function () {
+            if (typeof gtag === 'function') {
+                gtag('event', 'clikc_i_plan');
+            }
             floatingui.classList.add('present');
             floatcontent.classList.add('contentpresent');
             plancontent.classList.remove('floathide');
@@ -2513,12 +2531,18 @@
         }
 
         emailcontainer.addEventListener('click', function(e) {
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_i_email');
+            }
             let currentUrl = window.location.href;
             let currentSide = side.options[side.selectedIndex].dataset.side;
             let currentLevel = levelselection.value;
             this.href = `mailto:lnsarchviz@gmail.com?subject=Hello%20Support&body=Flat No: ${foundFlat.name},%0AFacing: ${currentSide},%0AFloor: ${currentLevel}%0A`;
         });
         whatsappcontainer.addEventListener('click', function(e) {
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_i_whatsapp');
+            }
             let currentUrl = window.location.href;
             let currentSide = side.options[side.selectedIndex].dataset.side;
             let currentLevel = levelselection.value;
@@ -2526,6 +2550,9 @@
         });
         levelselection.addEventListener('change', function() {
             level = levelselection.value;
+            if (typeof gtag === 'function') {
+                gtag('event', `toggle_i_flr${level}`);
+            }
             outerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/outer-dome/${currenttime}/Level${level}.avif`;
             outerDomeTexture(outerurl);
         });
@@ -2576,10 +2603,16 @@
         })
         side.addEventListener('change', function() {
             currentside = side.value;
+            if (typeof gtag === 'function') {
+                gtag('event', `toggle_iside_${currentside}`);
+            }
             outerdome.setAttribute('animation', 'to', `0 ${currentside} 0`);
             outerdome.emit('rotatestart');
         })
         booknow.addEventListener('click', function() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_i_book');
+            }
             floatingui.classList.add('present');
             floatcontent.classList.add('contentpresent');
             bookcontent.classList.remove('floathide');
@@ -2707,6 +2740,9 @@
                 //console.log(currentposistion);
                 if (!currentposistion) return;
 
+                if (typeof gtag === 'function') {
+                    gtag('event', 'hotspot_changed');
+                }
 
                 innerurl = `https://narasimman-sha.github.io/lnsarchviz/tours/inner-dome/${bhk}/${currenttime}/${currentposistion}.avif`;
                 // let sceneEl = document.querySelector('a-scene');
