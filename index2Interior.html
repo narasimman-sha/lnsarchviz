@@ -2452,11 +2452,21 @@
             }
             let currentSide = side.options[side.selectedIndex].dataset.side;
             let currentLevel = levelselection.value;
-            const shareData = {
-                title: document.title,
-                text: `Welcome to Interactive Apartment, Presenet ${foundFlat.name}, Floor ${currentLevel} and Facing ${currentSide}`,
-                url: window.location.href
-            };
+            let shareData;
+            if (foundFlat) {
+                shareData = {
+                    title: document.title,
+                    text: `Welcome to Interactive Apartment, Present Floor ${currentLevel} and Facing ${currentSide}`,
+                    url: window.location.href
+                };
+            }
+            if (!foundFlat) {
+                shareData = {
+                    title: document.title,
+                    text: `Welcome to Interactive Apartment, Present Floor ${currentLevel} and Facing ${currentSide}`,
+                    url: window.location.href
+                };
+            }
             if (navigator.share) {
                 try {
                     await navigator.share(shareData);
