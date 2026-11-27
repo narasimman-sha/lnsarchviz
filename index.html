@@ -2491,15 +2491,26 @@
         // --- Wire Up Event Listeners ---
 
         // Dropdown update
-        floorSelect.addEventListener('change', applyFilters);
+        floorSelect.addEventListener('change', function() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'toggle_floor');
+            }
+            applyFilters()
+        });
 
         filter2bhk.addEventListener('click', function() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'toggle_2BHK');
+            }
             //console.log(this)
             this.classList.toggle('bhkactive');
             activeBhkFilters['2BHK'] = this.classList.contains('bhkactive');
             applyFilters();
         });
         filter3bhk.addEventListener('click', function() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'toggle_3BHK');
+            }
             //console.log(this)
             this.classList.toggle('bhkactive');
             activeBhkFilters['3BHK'] = this.classList.contains('bhkactive');
@@ -2576,11 +2587,7 @@
             timing = 'day';
 
             if (typeof gtag === 'function') {
-                gtag('event', 'timing_toggle', {
-                    selected_timing: 'day',
-                    current_step: currentstep,
-                    button_id: daytrigger.id || 'daytrigger'
-                });
+                gtag('event', 'toggle_day');
             }
             playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
             daytrigger.classList.add('tactive');
@@ -2596,11 +2603,7 @@
             timing = 'night';
 
             if (typeof gtag === 'function') {
-                gtag('event', 'timing_toggle', {
-                    selected_timing: 'night',
-                    current_step: currentstep,
-                    button_id: nighttrigger.id || 'nighttrigger'
-                });
+                gtag('event', 'toggle_night');
             }
             playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
             daytrigger.classList.remove('tactive');
@@ -2614,6 +2617,9 @@
         // console.log(allvideo[timing].forward);
         planebtn.addEventListener('click', function() {
             if(!planebtnclick) {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'opening_3dplanes');
+                }
                 planebtnclick = true;
                 showcolors.classList.add('open');
                 showcolors.classList.remove('close');
@@ -2621,6 +2627,9 @@
                 planecontainer.classList.remove('is-hidden-3d');
             }
             else if(planebtnclick) {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'closing_3dplanes');
+                }
                 planebtnclick = false;
                 showcolors.classList.remove('open');
                 showcolors.classList.add('close');
@@ -2631,6 +2640,9 @@
 
         // Function to enter full screen
         function enterFullScreen() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'enter_fs');
+            }
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
@@ -2643,6 +2655,9 @@
 
         // Function to exit full screen
         function exitFullScreen() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'exit_fs');
+            }
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.webkitExitFullscreen) {
@@ -2666,6 +2681,9 @@
         });
 
         sharecontent.addEventListener('click', async () => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'clikc_sharebtn');
+            }
             const shareData = {
                 title: document.title,
                 text: 'Welcome to Interactive Apartment',
@@ -2696,12 +2714,18 @@
 
         // Open the overlay
         smallmap.addEventListener('click', () => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'enter_map');
+            }
             mapOverlay.classList.add('present');
             overlay.classList.add('active');
             modal.classList.remove('floathide');
             bookcontent.classList.add('floathide');
         });
         bookbtn.addEventListener('click', () => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_book');
+            }
             mapOverlay.classList.add('present');
             overlay.classList.add('active');
             bookcontent.classList.remove('floathide');
@@ -2735,6 +2759,9 @@
         }
 
         emailcontainer.addEventListener('click', function(e) {
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_email');
+            }
             let currentUrl = window.location.href;
             this.href = `mailto:lnsarchviz@gmail.com?subject=Hello%20Support`;
         });
@@ -2918,8 +2945,18 @@
             daytrigger.disabled = state;
             nighttrigger.disabled = state;
         }
-        leftbtn.addEventListener('click', moveLeft);
-        rightbtn.addEventListener('click', moveRight);
+        leftbtn.addEventListener('click', () => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'btn_left');
+            }
+            moveLeft();
+        });
+        rightbtn.addEventListener('click', () => {
+            if (typeof gtag === 'function') {
+                gtag('event', 'btn_right');
+            }
+            moveRight();
+        });
         mainvideo.addEventListener('ended', () => {
             setPlayingState(false);
         })
@@ -3018,6 +3055,9 @@
             return parseFloat((n / 10_000_000).toFixed(decimals));
         }
         function checkBHK(bhk, fid) {
+            if (typeof gtag === 'function') {
+                gtag('event', `interior_${fid}`);
+            }
             console.log(bhk, fid);
             if (bhk == '3BHK') {
                 window.open(`indexInterior.html?id=${fid}`, '_blank');
@@ -3300,8 +3340,14 @@
                 // PC Swipe detection when fully zoomed out
                 if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
                     if (diffX > 0) {
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'mouse_left');
+                        }
                         moveLeft();
                     } else {
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'mouse_right');
+                        }
                         moveRight();
                     }
                 }
@@ -3380,8 +3426,14 @@
                 if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
                     if (diffX > 0) {
                         // Swiped right
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'touch_left');
+                        }
                         moveLeft();
                     } else {
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'touch_right');
+                        }
                         // Swiped left
                         moveRight();
                     }
