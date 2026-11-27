@@ -2574,6 +2574,14 @@
         daytrigger.addEventListener('click', async () => {
             if(timing == 'day') return
             timing = 'day';
+
+            if (typeof gtag === 'function') {
+                gtag('event', 'timing_toggle', {
+                    selected_timing: 'day',
+                    current_step: currentstep,
+                    button_id: daytrigger.id || 'daytrigger'
+                });
+            }
             playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
             daytrigger.classList.add('tactive');
             nighttrigger.classList.remove('tactive');
@@ -2586,6 +2594,14 @@
         nighttrigger.addEventListener('click', async () => {
             if(timing == 'night') return
             timing = 'night';
+
+            if (typeof gtag === 'function') {
+                gtag('event', 'timing_toggle', {
+                    selected_timing: 'night',
+                    current_step: currentstep,
+                    button_id: nighttrigger.id || 'nighttrigger'
+                });
+            }
             playWithCanvasBuffer(allvideo[timing].forward[currentstep], 'pause');
             daytrigger.classList.remove('tactive');
             nighttrigger.classList.add('tactive');
